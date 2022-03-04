@@ -16,7 +16,7 @@ if __name__ == '__main__':
         "Regular Learning Rate": 0.1,
         "Slow Learning Rate": 1e-4,
         "Batch Size": 200,
-        "Epochs": 1250
+        "Epochs": 1000
     }
 
     # Initializing Model
