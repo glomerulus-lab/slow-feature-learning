@@ -15,7 +15,7 @@ if __name__ == '__main__':
         "Num Classes": 10,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
-        "Batch Size": 1,
+        "Batch Size": 200,
         "Epochs": 2000
     }
 
