@@ -8,8 +8,6 @@ if __name__ == '__main__':
     # Checking & Setting Device Allocation
     device = set_device()
 
-    print("updated")
-
     # Hyper Parameters
     hp = {
         "Input Size": 784,
@@ -17,7 +15,7 @@ if __name__ == '__main__':
         "Num Classes": 10,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
-        "Batch Size": 200,
+        "Batch Size": 1,
         "Epochs": 2000
     }
 
