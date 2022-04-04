@@ -8,6 +8,8 @@ if __name__ == '__main__':
     # Checking & Setting Device Allocation
     device = set_device()
 
+    print("updated")
+
     # Hyper Parameters
     hp = {
         "Input Size": 784,
