@@ -13,10 +13,10 @@ if __name__ == '__main__':
         "Input Size": 784,
         "Middle Layer Width": 2000,
         "Num Classes": 10,
-        "Regular Learning Rate": 0.1,
-        "Slow Learning Rate": 1e-4,
+        "Regular Learning Rate": 0.01,
+        "Slow Learning Rate": 0.001,
         "Batch Size": 200,
-        "Epochs": 1000
+        "Epochs": 2000
     }
 
     # Initializing Model
