@@ -15,8 +15,8 @@ if __name__ == '__main__':
         "Num Classes": 10,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
-        "Batch Size": 200,
-        "Epochs": 2000
+        "Batch Size": 100,
+        "Epochs": 5
     }
 
     # Initializing Model
@@ -58,15 +58,19 @@ if __name__ == '__main__':
         regular_accuracy_epoch = record_accuracy(device, reg_model, train_loader, validate_loader, epoch)
         regular_accuracy = np.concatenate((regular_accuracy, regular_accuracy_epoch))
 
-        print(f"-Finished epoch {epoch + 1}/{hp['Epochs']}")
+        f"-Finished epoch {epoch + 1}/{hp['Epochs']}"
+        f"Memory {torch.cuda.memory_allocated()}"
 
     # Accuracy csv
     complete_array = np.concatenate((slow_accuracy, regular_accuracy), axis=1)
     complete_dataframe = pd.DataFrame(complete_array).to_csv('accuracy_metrics')
-    print(f"-Saved accuracy metrics as 'accuracy_metrics'")
+    f"-Saved accuracy metrics as 'accuracy_metrics'"
 
     # Saving the entire model
     torch.save(slow_model.state_dict(), 'slow_model.pt')
-    print(f"-Saved Regular Model Parameters as 'slow_model.pt'")
+    f"-Saved Regular Model Parameters as 'slow_model.pt'"
     torch.save(reg_model.state_dict(), 'reg_model.pt')
-    print(f"-Saved Regular Model Parameters as 'reg_model.pt'")
+    f"-Saved Regular Model Parameters as 'reg_model.pt'"
+
+    # Memory from params and buffers
+    memory()

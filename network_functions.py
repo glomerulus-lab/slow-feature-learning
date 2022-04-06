@@ -61,3 +61,11 @@ def check_accuracy(device, model, loader):
             num_samples += predictions.size(0)
 
     return 100 - float(num_correct) / float(num_samples) * 100
+
+def memory():
+    mem_params = sum([param.nelement() * param.element_size() for param in model.parameters()])
+    f"Parameters memory: {mem_params}"
+    mem_bufs = sum([buf.nelement() * buf.element_size() for buf in model.buffers()])
+    f"Buffer memory: {mem_bufs}"
+    mem = mem_params + mem_bufs  # in byte
+    f"Total memory: {mem}"
