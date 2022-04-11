@@ -10,9 +10,15 @@ def set_device():
     return device
 
 
-def mnist_dataset(batch_size, train=True):
+def mnist_dataset(batch_size, train=True, values=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
     dataset = datasets.MNIST(root='dataset/', train=train, transform=transforms.ToTensor(), download=True)
-    loader = DataLoader(dataset=dataset, batch_size=batch_size, shuffle=True)
+    list = []
+    targets_list = dataset.targets.tolist()
+    for i in range(len(dataset)):
+        if targets_list[i] in values:
+            list.append(i)
+    dataset1 = torch.utils.data.Subset(dataset, list)
+    loader = DataLoader(dataset=dataset1, batch_size=batch_size, shuffle=True)
     return loader
 
 
