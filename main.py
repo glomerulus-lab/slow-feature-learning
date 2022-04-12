@@ -7,6 +7,7 @@ import pandas as pd
 if __name__ == '__main__':
     # Checking & Setting Device Allocation
     device = set_device()
+    print(f"Running on {device}")
 
     # Hyper Parameters
     hp = {
@@ -18,6 +19,7 @@ if __name__ == '__main__':
         "Batch Size": 200,
         "Epochs": 3000
     }
+    print(f"Hyper Parameters: {hp}")
 
     # Initializing Model
     slow_model = NN(input_size=hp["Input Size"],
@@ -46,6 +48,7 @@ if __name__ == '__main__':
     slow_accuracy = np.zeros((1, 3))
     regular_accuracy = np.zeros((1, 3))
 
+    print("Training models...")
     for epoch in range(hp["Epochs"]):
 
         # Slow Model
@@ -70,3 +73,4 @@ if __name__ == '__main__':
     print(f"-Saved Regular Model Parameters as 'slow_model.pt'")
     torch.save(reg_model.state_dict(), 'reg_model.pt')
     print(f"-Saved Regular Model Parameters as 'reg_model.pt'")
+
