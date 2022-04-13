@@ -17,7 +17,7 @@ if __name__ == '__main__':
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
         "Batch Size": 200,
-        "Epochs": 3000
+        "Epochs": 100
     }
     print(f"Hyper Parameters: {hp}")
 
