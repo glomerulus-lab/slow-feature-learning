@@ -7,6 +7,7 @@ import pandas as pd
 if __name__ == '__main__':
     # Checking & Setting Device Allocation
     device = set_device()
+    print(f"Running on {device}")
 
     # Hyper Parameters
     hp = {
@@ -15,9 +16,10 @@ if __name__ == '__main__':
         "Num Classes": 10,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
-        "Batch Size": 2,
-        "Epochs": 1
+        "Batch Size": 200,
+        "Epochs": 100
     }
+    print(f"Hyper Parameters: {hp}")
 
     # Initializing Model
     slow_model = NN(input_size=hp["Input Size"],
@@ -29,8 +31,10 @@ if __name__ == '__main__':
                    num_classes=hp["Num Classes"]).to(device=device)
 
     # Loading MNIST Dataset
-    train_loader = mnist_dataset(hp["Batch Size"])
-    validate_loader = mnist_dataset(hp["Batch Size"], train=False)
+    mnist_list = [0, 1]
+    print(f"Loading for MNIST values {mnist_list}")
+    train_loader = mnist_dataset(hp["Batch Size"], values=mnist_list)
+    validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_list)
 
     # Loss function
     loss_function = nn.CrossEntropyLoss()
@@ -46,6 +50,7 @@ if __name__ == '__main__':
     slow_accuracy = np.zeros((1, 3))
     regular_accuracy = np.zeros((1, 3))
 
+    print("Training models...")
     for epoch in range(hp["Epochs"]):
 
         # Slow Model
