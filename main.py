@@ -13,7 +13,7 @@ if __name__ == '__main__':
     hp = {
         "Input Size": 784,
         "Middle Layer Width": 2000,
-        "Num Classes": 10,
+        "Num Classes": 2,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
         "Batch Size": 200,
