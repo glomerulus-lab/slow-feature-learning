@@ -16,8 +16,8 @@ if __name__ == '__main__':
         "Num Classes": 2,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
-        "Batch Size": 200,
-        "Epochs": 3000
+        "Batch Size": 100,
+        "Epochs": 5
     }
     print(f"Hyper Parameters: {hp}")
 
@@ -54,12 +54,12 @@ if __name__ == '__main__':
     for epoch in range(hp["Epochs"]):
 
         # Slow Model
-        train(train_loader, device, slow_model, loss_function, sl_optimizer)
+        train(train_loader, device, slow_model, loss_function, sl_optimizer, values=mnist_values)
         slow_accuracy_epoch = record_accuracy(device, slow_model, train_loader, validate_loader, epoch)
         slow_accuracy = np.concatenate((slow_accuracy, slow_accuracy_epoch))
 
         # Regular Model
-        train(train_loader, device, reg_model, loss_function, r_optimizer)
+        train(train_loader, device, reg_model, loss_function, r_optimizer, values=mnist_values)
         regular_accuracy_epoch = record_accuracy(device, reg_model, train_loader, validate_loader, epoch)
         regular_accuracy = np.concatenate((regular_accuracy, regular_accuracy_epoch))
 

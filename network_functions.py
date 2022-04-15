@@ -22,14 +22,14 @@ def mnist_dataset(batch_size, train=True, values=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     return loader
 
 
-def train(loader, device, model, loss_function, optimizer_function):
+def train(loader, device, model, loss_function, optimizer_function, values=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
     for batch_idx, (data, targets) in enumerate(loader):
         data = data.reshape(data.shape[0], -1).to(device=device)
         targets = targets.to(device=device)
 
         # Forwards.
         scores = model(data)
-        loss = loss_function(scores, targets)
+        loss = loss_function(scores, classify(targets, values))
 
         # Backwards.
         optimizer_function.zero_grad()
@@ -68,10 +68,7 @@ def check_accuracy(device, model, loader):
 
     return 100 - float(num_correct) / float(num_samples) * 100
 
-def memory():
-    mem_params = sum([param.nelement() * param.element_size() for param in model.parameters()])
-    f"Parameters memory: {mem_params}"
-    mem_bufs = sum([buf.nelement() * buf.element_size() for buf in model.buffers()])
-    f"Buffer memory: {mem_bufs}"
-    mem = mem_params + mem_bufs  # in byte
-    f"Total memory: {mem}"
+def classify(targets, values):
+    for key, element in enumerate(values):
+        targets[targets == element] = key
+    return targets
