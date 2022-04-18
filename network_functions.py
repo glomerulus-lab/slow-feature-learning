@@ -10,23 +10,29 @@ def set_device():
     return device
 
 
-def mnist_dataset(batch_size, train=True, values=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
+def mnist_dataset(batch_size, train=True, values=list(range(10))):
+    # Initializing MNIST data set.
     dataset = datasets.MNIST(root='dataset/', train=train, transform=transforms.ToTensor(), download=True)
+
     targets_list = dataset.targets.tolist()
     values_index = [i for i in range(len(dataset)) if targets_list[i] in values]
+
+    # Creating a subset of ### MNIST targets.
     subset = torch.utils.data.Subset(dataset, values_index)
     loader = DataLoader(dataset=subset, batch_size=batch_size, shuffle=True)
+
     return loader
 
 
-def train(loader, device, model, loss_function, optimizer_function, values=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
+def train(loader, device, model, loss_function, optimizer_function, values=list(range(10))):
+    # Training on each data point.
     for batch_idx, (data, targets) in enumerate(loader):
         data = data.reshape(data.shape[0], -1).to(device=device)
         targets = targets.to(device=device)
 
         # Forwards.
         scores = model(data)
-        loss = loss_function(scores, classify(targets, values))
+        loss = loss_function(scores, classify_targets(targets, values))
 
         # Backwards.
         optimizer_function.zero_grad()
@@ -37,7 +43,7 @@ def train(loader, device, model, loss_function, optimizer_function, values=[0, 1
 
 def record_accuracy(device, model, train_loader, test_loader, epoch):
     epoch_accuracy = np.array([[
-        epoch+1,
+        epoch + 1,
         check_accuracy(device, model, train_loader),
         check_accuracy(device, model, test_loader)
     ]])
@@ -65,8 +71,11 @@ def check_accuracy(device, model, loader):
 
     return 100 - float(num_correct) / float(num_samples) * 100
 
-def classify(targets, values):
+
+def classify_targets(targets, values):
     new_targets = targets.clone()
+
+    # Changing targets to a classifiable number.
     for key, element in enumerate(values):
         new_targets[new_targets == element] = key
     return new_targets
