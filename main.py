@@ -14,10 +14,10 @@ if __name__ == '__main__':
         "Input Size": 784,
         "Middle Layer Width": 2000,
         "Num Classes": 2,
-        "Regular Learning Rate": 0.01,
-        "Slow Learning Rate": 0.001,
-        "Batch Size": 100,
-        "Epochs": 5
+        "Regular Learning Rate": 0.1,
+        "Slow Learning Rate": 0.01,
+        "Batch Size": 200,
+        "Epochs": 2000
     }
     print(f"Hyper Parameters: {hp}")
 
