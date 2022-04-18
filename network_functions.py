@@ -12,13 +12,10 @@ def set_device():
 
 def mnist_dataset(batch_size, train=True, values=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9]):
     dataset = datasets.MNIST(root='dataset/', train=train, transform=transforms.ToTensor(), download=True)
-    list = []
     targets_list = dataset.targets.tolist()
-    for i in range(len(dataset)):
-        if targets_list[i] in values:
-            list.append(i)
-    dataset1 = torch.utils.data.Subset(dataset, list)
-    loader = DataLoader(dataset=dataset1, batch_size=batch_size, shuffle=True)
+    values_index = [i for i in range(len(dataset)) if targets_list[i] in values]
+    subset = torch.utils.data.Subset(dataset, values_index)
+    loader = DataLoader(dataset=subset, batch_size=batch_size, shuffle=True)
     return loader
 
 
@@ -69,6 +66,7 @@ def check_accuracy(device, model, loader):
     return 100 - float(num_correct) / float(num_samples) * 100
 
 def classify(targets, values):
+    new_targets = targets.clone()
     for key, element in enumerate(values):
-        targets[targets == element] = key
-    return targets
+        new_targets[new_targets == element] = key
+    return new_targets
