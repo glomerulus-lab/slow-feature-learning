@@ -60,7 +60,7 @@ def check_accuracy(device, model, loader, values = list(range(10))):
         for x, y in loader:
             x = x.to(device=device)
             y = y.to(device=device)
-            y = classify_targets(y, values)
+            y = classify_targets(y, values).cpu()
             x = x.reshape(x.shape[0], -1)
 
             scores = model(x)
@@ -75,7 +75,6 @@ def check_accuracy(device, model, loader, values = list(range(10))):
 
 def classify_targets(targets, values):
     new_targets = targets.clone()
-    new_targets = new_targets.cpu()
 
     # Changing targets to a classifiable number.
     for key, element in enumerate(values):
