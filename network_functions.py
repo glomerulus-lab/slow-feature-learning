@@ -41,17 +41,17 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
         optimizer_function.step()
 
 
-def record_accuracy(device, model, train_loader, test_loader, epoch):
+def record_accuracy(device, model, train_loader, test_loader, epoch, values=list(range(10))):
     epoch_accuracy = np.array([[
         epoch + 1,
-        check_accuracy(device, model, train_loader),
-        check_accuracy(device, model, test_loader)
+        check_accuracy(device, model, train_loader, values),
+        check_accuracy(device, model, test_loader, values)
     ]])
 
     return epoch_accuracy
 
 
-def check_accuracy(device, model, loader):
+def check_accuracy(device, model, loader, values = list(range(10))):
     num_correct = 0
     num_samples = 0
     model.eval()
@@ -60,6 +60,7 @@ def check_accuracy(device, model, loader):
         for x, y in loader:
             x = x.to(device=device)
             y = y.to(device=device)
+            y = classify_targets(y, values)
             x = x.reshape(x.shape[0], -1)
 
             scores = model(x)
@@ -69,7 +70,7 @@ def check_accuracy(device, model, loader):
             num_correct += (predictions == y).sum()
             num_samples += predictions.size(0)
 
-    return 100 - float(num_correct) / float(num_samples) * 100
+    return 100 - 100 * num_correct / num_samples
 
 
 def classify_targets(targets, values):
