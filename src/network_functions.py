@@ -44,14 +44,14 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
 def record_accuracy(device, model, train_loader, test_loader, epoch, values=list(range(10))):
     epoch_accuracy = np.array([[
         epoch + 1,
-        check_accuracy(device, model, train_loader, values),
-        check_accuracy(device, model, test_loader, values)
+        check_accuracy(device, model, train_loader, values).cpu(),
+        check_accuracy(device, model, test_loader, values).cpu()
     ]])
 
     return epoch_accuracy
 
 
-def check_accuracy(device, model, loader, values = list(range(10))):
+def check_accuracy(device, model, loader, values=list(range(10))):
     num_correct = 0
     num_samples = 0
     model.eval()
