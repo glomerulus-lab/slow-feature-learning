@@ -14,10 +14,10 @@ if __name__ == '__main__':
         "Input Size": 784,
         "Middle Layer Width": 2000,
         "Num Classes": 2,
-        "Regular Learning Rate": 0.1,
-        "Slow Learning Rate": 0.01,
+        "Regular Learning Rate": 0.01,
+        "Slow Learning Rate": 0.001,
         "Batch Size": 200,
-        "Epochs": 10
+        "Epochs": 3000
     }
     print(f"Hyper Parameters: {hp}")
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
                    num_classes=hp["Num Classes"]).to(device=device)
 
     # Loading MNIST Dataset
-    mnist_values = [2, 8]
+    mnist_values = [0, 1]
     print(f"MNIST digits {mnist_values}")
     train_loader = mnist_dataset(hp["Batch Size"], values=mnist_values)
     validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_values)
