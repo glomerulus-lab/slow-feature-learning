@@ -41,7 +41,7 @@ if __name__ == '__main__':
 
     # Optimizers
     sl_optimizer = optim.SGD([{'params': slow_model.features.hidden_layer.parameters()},
-                              {'params': slow_model.features.readout.parameters(),
+                              {'params': slow_model.readout.parameters(),
                                'lr': hp["Regular Learning Rate"]}],
                              lr=hp["Slow Learning Rate"])
     r_optimizer = optim.SGD(reg_model.parameters(), lr=hp["Regular Learning Rate"])
@@ -66,6 +66,8 @@ if __name__ == '__main__':
         print("Reg: ")
         print(regular_accuracy_epoch)
         print(f"-Finished epoch {epoch + 1}/{hp['Epochs']}")
+
+        # compute al. on both t and v.
 
     # Accuracy csv
     complete_array = np.concatenate((slow_accuracy, regular_accuracy), axis=1)

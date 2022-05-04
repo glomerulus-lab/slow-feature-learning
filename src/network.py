@@ -10,10 +10,11 @@ class NN(nn.Module):
         self.features = nn.Sequential(OrderedDict([
             ('hidden_layer', nn.Linear(input_size, middle_width)),
             ('hidden_activation', nn.ReLU()),
-            ('readout', nn.Linear(middle_width, num_classes))
         ]))
+        self.readout = nn.Linear(middle_width, num_classes)
 
     def forward(self, x):
         x = self.features(x)
+        x = self.readout(x)
 
         return x
