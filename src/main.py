@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # Loading MNIST Dataset
     mnist_values = [8, 9]
     print(f"MNIST digits {mnist_values}")
-    train_loader = mnist_dataset(hp["Batch Size"], values=mnist_values)
+    targets, train_loader = mnist_dataset(hp["Batch Size"], values=mnist_values)
     validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_values)
 
     # Loss function
