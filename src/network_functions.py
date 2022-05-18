@@ -39,13 +39,16 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
         loss.backward()
 
         optimizer_function.step()
+        phi = model.features(data)
+        return targets, phi
 
 
-def record_accuracy(device, model, train_loader, test_loader, epoch, values=list(range(10))):
+def record_accuracy(device, model, train_loader, test_loader, epoch, kernel_alignment, values=list(range(10))):
     epoch_accuracy = np.array([[
         epoch + 1,
         check_accuracy(device, model, train_loader, values).cpu(),
-        check_accuracy(device, model, test_loader, values).cpu()
+        check_accuracy(device, model, test_loader, values).cpu(),
+        kernel_alignment
     ]])
 
     return epoch_accuracy
@@ -79,3 +82,49 @@ def classify_targets(targets, values):
     for key, element in enumerate(values):
         new_targets[targets == element] = key
     return new_targets
+
+
+# Kernel Alignment Fucntions
+
+def kernel_calc(y, phi):
+
+    # Output Kernel
+    y = torch.t(torch.unsqueeze(y, -1))
+    K1 = torch.matmul(torch.t(y), y)
+    K1c = kernel_centering(K1.float())
+
+    # Feature Kernel
+    K2 = torch.mm(phi, torch.t(phi))
+    K2c = kernel_centering(K2)
+
+    return kernel_alignment(K1c, K2c)
+
+
+def frobenius_product(K1, K2):
+    return torch.trace(torch.mm(K2, torch.t(K1)))
+
+
+def kernel_alignment(K1, K2):
+    return frobenius_product(K1, K2) / ((torch.norm(K1, p='fro') * torch.norm(K2, p='fro')))
+
+
+def kernel_centering(K):
+    # Lemmna 1
+
+    m = K.size()[0]
+    I = torch.eye(m)
+    l = torch.ones(m, 1)
+
+    # I - ll^T / m
+    mat = I - torch.matmul(l, torch.t(l)) / m
+
+    return torch.matmul(torch.matmul(mat, K), mat)
+
+
+def ones(vector):
+    for i in range(vector.size()[1]):
+        if vector[0][i] == 9:
+            vector[0][i] = 1
+        elif vector[0][i] == 8:
+            vector[0][i] = -1
+    return vector
