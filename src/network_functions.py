@@ -72,7 +72,7 @@ def check_accuracy(device, model, loader, values=list(range(10))):
             num_correct += (predictions == y).sum()
             num_samples += predictions.size(0)
 
-    return 100 - 100. * num_correct / num_samples
+    return 100. * num_correct / num_samples
 
 
 def classify_targets(targets, values):
