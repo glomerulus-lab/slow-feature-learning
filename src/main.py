@@ -47,28 +47,35 @@ if __name__ == '__main__':
     r_optimizer = optim.SGD(reg_model.parameters(), lr=hp["Regular Learning Rate"])
 
     # Creating 'empty' arrays for future storing of accuracy metrics
-    slow_accuracy = np.zeros((1, 4))
-    regular_accuracy = np.zeros((1, 4))
+    slow_accuracy = np.zeros((hp["Epochs"], 5))
+    regular_accuracy = np.zeros((hp["Epochs"], 5))
 
     print("Training models...")
     for epoch in range(hp["Epochs"]):
 
         # Slow Model
-        sl_targets, sl_phi = train(train_loader, device, slow_model, loss_function, sl_optimizer, values=mnist_values)
-        sl_kernel_align = kernel_calc(sl_targets, sl_phi).item()
-        slow_accuracy_epoch = record_accuracy(device, slow_model, train_loader, validate_loader, epoch, sl_kernel_align, mnist_values)
+        sl_mean, sl_ste = train(train_loader, device, slow_model, loss_function, sl_optimizer, values=mnist_values)
+        slow_accuracy[epoch][0] = epoch + 1
+        slow_accuracy[epoch][1] = check_accuracy(device, slow_model, train_loader, mnist_values).cpu()
+        slow_accuracy[epoch][2] = check_accuracy(device, slow_model, validate_loader, mnist_values).cpu()
+        slow_accuracy[epoch][3] = sl_mean
+        slow_accuracy[epoch][4] = sl_ste
         # CALCULATE THE K.A. AND RECORD IT TO A CSV (FOR SLOW MODEL)
-        slow_accuracy = np.concatenate((slow_accuracy, slow_accuracy_epoch))
         print("Slow: ")
-        print(slow_accuracy_epoch)
+        print(slow_accuracy[epoch])
+
         # Regular Model
-        reg_targets, reg_phi = train(train_loader, device, reg_model, loss_function, r_optimizer, values=mnist_values)
-        reg_kernel_align = kernel_calc(reg_targets, reg_phi).item()
-        regular_accuracy_epoch = record_accuracy(device, reg_model, train_loader, validate_loader, epoch, reg_kernel_align, mnist_values)
+        reg_mean, reg_ste = train(train_loader, device, reg_model, loss_function, r_optimizer, values=mnist_values)
+        regular_accuracy[epoch][0] = epoch + 1
+        regular_accuracy[epoch][1] = check_accuracy(device, reg_model, train_loader, mnist_values).cpu()
+        regular_accuracy[epoch][2] = check_accuracy(device, reg_model, validate_loader, mnist_values).cpu()
+        regular_accuracy[epoch][3] = reg_mean
+        regular_accuracy[epoch][4] = sl_ste
+
+
         # CALCULATE THE K.A. AND RECORD IT TO A CSV (FOR REG MODEL)
-        regular_accuracy = np.concatenate((regular_accuracy, regular_accuracy_epoch))
         print("Reg: ")
-        print(regular_accuracy_epoch)
+        print(regular_accuracy[epoch])
         print(f"-Finished epoch {epoch + 1}/{hp['Epochs']}")
 
         # compute al. on both t and v.

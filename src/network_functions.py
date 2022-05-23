@@ -26,6 +26,10 @@ def mnist_dataset(batch_size, train=True, values=list(range(10))):
 
 def train(loader, device, model, loss_function, optimizer_function, values=list(range(10))):
     # Training on each data point.
+
+    # Set array full of zeros.
+    kernel_alignments = torch.zeros(len(loader))
+
     for batch_idx, (data, targets) in enumerate(loader):
         data = data.reshape(data.shape[0], -1).to(device=device)
         targets = targets.to(device=device)
@@ -40,15 +44,20 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
 
         optimizer_function.step()
         phi = model.features(data)
-        return targets, phi
+
+        kernel_alignments[batch_idx] = kernel_calc(targets, phi)
+
+    return torch.mean(kernel_alignments).item(), torch.std(kernel_alignments).item()/len(kernel_alignments)
+    # return mean and STD or STE of kernel alignment
 
 
-def record_accuracy(device, model, train_loader, test_loader, epoch, kernel_alignment, values=list(range(10))):
+def record_accuracy(device, model, train_loader, test_loader, epoch, ste, mean, values=list(range(10))):
     epoch_accuracy = np.array([[
         epoch + 1,
         check_accuracy(device, model, train_loader, values).cpu(),
         check_accuracy(device, model, test_loader, values).cpu(),
-        kernel_alignment
+        mean,
+        ste
     ]])
 
     return epoch_accuracy
