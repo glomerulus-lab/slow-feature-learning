@@ -31,7 +31,7 @@ if __name__ == '__main__':
                    num_classes=hp["Num Classes"]).to(device=device)
 
     # Loading MNIST Dataset
-    mnist_values = [2, 7]
+    mnist_values = [0, 1]
     print(f"MNIST digits {mnist_values}")
     train_loader = mnist_dataset(hp["Batch Size"], values=mnist_values)
     validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_values)
