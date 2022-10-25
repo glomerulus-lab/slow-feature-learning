@@ -12,12 +12,12 @@ if __name__ == '__main__':
     # Hyper Parameters
     hp = {
         "Input Size": 784,
-        "Middle Layer Width": 2000,
+        "Middle Layer Width": 2,
         "Num Classes": 2,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
-        "Batch Size": 200,
-        "Epochs": 3000
+        "Batch Size": 10,
+        "Epochs": 20
     }
     print(f"Hyper Parameters: {hp}")
 
@@ -37,8 +37,7 @@ if __name__ == '__main__':
     validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_values)
 
     # Loss function
-    loss_function = nn.CrossEntropyLoss()
-
+    loss_function = nn.MSELoss()
     # Optimizers
     sl_optimizer = optim.SGD([{'params': slow_model.features.hidden_layer.parameters()},
                               {'params': slow_model.readout.parameters(),
