@@ -8,6 +8,7 @@ import torch
 import torchvision
 import torch.nn as nn
 import torch.optim as optim
+import resources
 import sys
 import json 
 
@@ -36,10 +37,8 @@ if __name__ == '__main__':
   else:
      slr = sys.argv[5]
   
-  # Setting the device to use cuda if avaiable. 
-  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
   # initializing the model
-  model = resources.NN(20, 10, values = [2, 7]).to(device)
+  model = resources.NN(20, 10, values = [2, 7])
   # initializing the dataframe
   training = resources.mnist_dataset(5, values = [2, 7])
   val = resources.mnist_dataset(5, train=False, values= [2, 7])
