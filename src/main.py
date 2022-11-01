@@ -4,7 +4,6 @@
 #
 # By Cameron G. Kaminski
 
-import resources
 import torch
 import torchvision
 import torch.nn as nn
