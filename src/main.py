@@ -40,7 +40,7 @@ if __name__ == '__main__':
      slr = float(sys.argv[6])
   
   # initializing the model
-  model = resources.NN(middle_width, epochs, mnist_values).to(device='gpu')
+  model = resources.NN(middle_width, epochs, mnist_values).to(device='cuda')
   # initializing the dataframe
   training = resources.mnist_dataset(batch_size, values = mnist_values)
   val = resources.mnist_dataset(batch_size, train=False, values = mnist_values)
