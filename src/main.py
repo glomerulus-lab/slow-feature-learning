@@ -16,7 +16,10 @@ def store_data(dict, mnist_digits, lr, slr):
   digits = ""
   for v in mnist_digits:
     digits = digits + str(v)
-  filename = digits
+  if lr != slr:
+    filename = "s" + digits
+  else:
+    filename = 'r' + digits
   with open(filename + ".json", "w") as write_file:
     json.dump(dict, write_file)
 
@@ -25,28 +28,27 @@ def store_data(dict, mnist_digits, lr, slr):
 if __name__ == '__main__':
 
   # Hyper parameters
-  print(sys.argv[0])
-  #mnist_values = list(map(int, map(float, list(sys.argv[0]))))
-  mnist_values = [1,2]
-  middle_width = int(sys.argv[1])
-  epochs = int(sys.argv[2])
-  batch_size = int(sys.argv[3])
-  lr = sys.argv[4]
-  if sys.argv[5] is None: 
+  print(sys.argv[1])
+  mnist_values = list(map(int, list(sys.argv[1])))
+  middle_width = int(sys.argv[2])
+  epochs = int(sys.argv[3])
+  batch_size = int(sys.argv[4])
+  lr = float(sys.argv[5])
+  if sys.argv[6] is None: 
     slr = lr
   else:
-     slr = sys.argv[5]
+     slr = float(sys.argv[6])
   
   # initializing the model
-  model = resources.NN(20, 10, values = [2, 7])
+  model = resources.NN(middle_width, epochs, mnist_values).to(device='gpu')
   # initializing the dataframe
-  training = resources.mnist_dataset(5, values = [2, 7])
-  val = resources.mnist_dataset(5, train=False, values= [2, 7])
+  training = resources.mnist_dataset(batch_size, values = mnist_values)
+  val = resources.mnist_dataset(batch_size, train=False, values = mnist_values)
   # optimizer
   optimizer = optim.SGD([{'params': model.features.hidden_layer.parameters()},
                             {'params': model.readout.parameters(),
-                             'lr': 0.1}],
-                           lr=0.01)
+                             'lr': lr}],
+                           lr=slr)
   # loss 
   loss = nn.MSELoss()
 
@@ -59,4 +61,4 @@ if __name__ == '__main__':
     "Validation Accuracy": val_accuracy.tolist()
   }
 
-  store_data(data, mnist_values, lr, slr)
+  store_data(data, sys.argv[1], lr, slr)

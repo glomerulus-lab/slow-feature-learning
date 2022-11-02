@@ -19,6 +19,8 @@ Nueral Network Class
 """
 class NN(nn.Module):
 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
     def __init__(self, middle_width, epochs, values):
 
         super(NN, self).__init__()
@@ -42,8 +44,8 @@ class NN(nn.Module):
         cka = torch.zeros(len(loader))
 
         for i, (data, targets) in enumerate(loader):
-            data = data.reshape(data.shape[0], -1)
-            targets = targets.to(torch.float32)
+            data = data.reshape(data.shape[0], -1).to(device=self.device)
+            targets = targets.to(torch.float32).to(device=self.device)
 
             # Forwards pass.
             scores = self(data)
@@ -60,7 +62,7 @@ class NN(nn.Module):
             
             # Recording the C.K.A. for the batch index.
             if record:
-                cka[i] = kernel_calc(targets, self.features(data))
+                cka[i] = kernel_calc(targets, self.features(data).to(device=self.device))
         
         # Returning the C.K.A. if the option to record was chosen.
         if record:
@@ -78,6 +80,8 @@ class NN(nn.Module):
                 mcka[epoch] = torch.mean(self.train_one_epoch(training, loss_function, optimizer)).item()
                 train_accuracy[epoch] = self.check_accuracy(training)
                 val_accuracy[epoch] = self.check_accuracy(val)
+
+                print("Epoch " + str(epoch) + " | " +str(mcka[epoch]))
             # No record case.
             else: train_one_epoch(training, loss_function, optimizer, record=False)
         
@@ -102,8 +106,8 @@ class NN(nn.Module):
 
         with torch.no_grad():
             for x, y in loader:
-                x = x
-                y = self.classify_targets(y)
+                x = x.to(device=self.device)
+                y = self.classify_targets(y).to(device=self.device)
                 x = x.reshape(x.shape[0], -1)
 
                 scores = self(x)
