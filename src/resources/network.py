@@ -62,7 +62,7 @@ class NN(nn.Module):
             
             # Recording the C.K.A. for the batch index.
             if record:
-                cka[i] = kernel_calc(targets, self.features(data).to(device=self.device))
+                cka[i] = kernel_calc(self.device, targets, self.features(data).to(device=self.device))
         
         # Returning the C.K.A. if the option to record was chosen.
         if record:
@@ -118,22 +118,22 @@ class NN(nn.Module):
                 samples += predictions.size(0)
         return correct / samples
 
-def kernel_calc(y, phi):
+def kernel_calc(device, y, phi):
 
     # Output Kernel
-    y = torch.t(torch.unsqueeze(y, -1))
+    y = torch.t(torch.unsqueeze(y, -1)).to(device=device)
     K1 = torch.matmul(torch.t(y), y)
     K1c = kernel_centering(K1.float())
 
     # Feature Kernel
-    K2 = torch.mm(phi, torch.t(phi))
+    K2 = torch.mm(phi, torch.t(phi)).to(device=device)
     K2c = kernel_centering(K2)
 
     return kernel_alignment(K1c, K2c)
 
 
 def frobenius_product(K1, K2):
-    return torch.trace(torch.mm(K2, torch.t(K1)))
+    return torch.trace(torch.mm(K2, torch.t(K1))).to(device=self.device)
 
 
 def kernel_alignment(K1, K2):
