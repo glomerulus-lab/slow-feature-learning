@@ -71,13 +71,13 @@ class NN(nn.Module):
 
     def trains(self, training, val, loss_function, optimizer, recordcka=True):
         # Array full of the mean C.K.A. across the the model.
-        mcka = torch.zeros(self.epochs)
+        mcka = torch.zeros(self.epochs).to(device=self.device)
         train_accuracy = torch.zeros(self.epochs)
         val_accuracy = torch.zeros(self.epochs)
         for epoch in range(self.epochs):
             # When recordingm run the training & return the C.K.A. 
             if recordcka:
-                mcka[epoch] = torch.mean(self.train_one_epoch(training, loss_function, optimizer)).item()
+                mcka[epoch] = torch.mean(self.train_one_epoch(training, loss_function, optimizer)).item().to(device=self.device)
                 train_accuracy[epoch] = self.check_accuracy(training)
                 val_accuracy[epoch] = self.check_accuracy(val)
 
@@ -106,11 +106,10 @@ class NN(nn.Module):
 
         with torch.no_grad():
             for x, y in loader:
-                x = x.to(device=self.device)
                 y = self.classify_targets(y).to(device=self.device)
                 x = x.reshape(x.shape[0], -1)
-
-                scores = self(x)
+                x = x.to(device=self.device)
+                
                 # 64images x 10,
 
                 predictions = scores.argmax(1)
@@ -122,18 +121,18 @@ def kernel_calc(device, y, phi):
 
     # Output Kernel
     y = torch.t(torch.unsqueeze(y, -1)).to(device=device)
-    K1 = torch.matmul(torch.t(y), y)
-    K1c = kernel_centering(K1.float())
+    K1 = torch.matmul(torch.t(y), y).to(device=device)
+    K1c = kernel_centering(K1.float()).to(device=device)
 
     # Feature Kernel
     K2 = torch.mm(phi, torch.t(phi)).to(device=device)
-    K2c = kernel_centering(K2)
+    K2c = kernel_centering(K2).to(device=device)
 
-    return kernel_alignment(K1c, K2c)
+    return kernel_alignment(K1c, K2c).to(device=device)
 
 
 def frobenius_product(K1, K2):
-    return torch.trace(torch.mm(K2, torch.t(K1))).to(device=self.device)
+    return torch.trace(torch.mm(K2, torch.t(K1)))
 
 
 def kernel_alignment(K1, K2):
@@ -144,10 +143,10 @@ def kernel_centering(K):
     # Lemmna 1
 
     m = K.size()[0]
-    I = torch.eye(m)
-    l = torch.ones(m, 1)
+    I = torch.eye(m).to(device=device)
+    l = torch.ones(m, 1).to(device=device)
 
     # I - ll^T / m
-    mat = I - torch.matmul(l, torch.t(l)) / m
+    mat = I - torch.matmul(l, torch.t(l)).to(device=device)/ m
 
     return torch.matmul(torch.matmul(mat, K), mat)
