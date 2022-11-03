@@ -110,7 +110,8 @@ class NN(nn.Module):
                 y = self.classify_targets(y).to(device=self.device)
                 x = x.reshape(x.shape[0], -1)
                 
-                # 64images x 10,
+                # 64images x 10
+                scores = self(x)
 
                 predictions = scores.argmax(1)
                 correct += (predictions == y).sum()
