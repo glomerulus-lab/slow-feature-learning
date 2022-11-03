@@ -77,7 +77,7 @@ class NN(nn.Module):
         for epoch in range(self.epochs):
             # When recordingm run the training & return the C.K.A. 
             if recordcka:
-                mcka[epoch] = torch.mean(self.train_one_epoch(training, loss_function, optimizer)).item().to(device=self.device)
+                mcka[epoch] = torch.mean(self.train_one_epoch(training, loss_function, optimizer)).item()
                 train_accuracy[epoch] = self.check_accuracy(training)
                 val_accuracy[epoch] = self.check_accuracy(val)
 
@@ -106,9 +106,9 @@ class NN(nn.Module):
 
         with torch.no_grad():
             for x, y in loader:
+                x = x.to(device=self.device)
                 y = self.classify_targets(y).to(device=self.device)
                 x = x.reshape(x.shape[0], -1)
-                x = x.to(device=self.device)
                 
                 # 64images x 10,
 
