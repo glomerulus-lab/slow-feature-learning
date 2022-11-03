@@ -122,11 +122,11 @@ def kernel_calc(device, y, phi):
     # Output Kernel
     y = torch.t(torch.unsqueeze(y, -1)).to(device=device)
     K1 = torch.matmul(torch.t(y), y).to(device=device)
-    K1c = kernel_centering(K1.float()).to(device=device)
+    K1c = kernel_centering(device, K1.float()).to(device=device)
 
     # Feature Kernel
     K2 = torch.mm(phi, torch.t(phi)).to(device=device)
-    K2c = kernel_centering(K2).to(device=device)
+    K2c = kernel_centering(device, K2).to(device=device)
 
     return kernel_alignment(K1c, K2c).to(device=device)
 
@@ -139,7 +139,7 @@ def kernel_alignment(K1, K2):
     return frobenius_product(K1, K2) / ((torch.norm(K1, p='fro') * torch.norm(K2, p='fro')))
 
 
-def kernel_centering(K):
+def kernel_centering(device, K):
     # Lemmna 1
 
     m = K.size()[0]
