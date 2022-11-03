@@ -39,8 +39,9 @@ if __name__ == '__main__':
   else:
      slr = float(sys.argv[6])
   
+  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
   # initializing the model
-  model = resources.NN(middle_width, epochs, mnist_values).to(device='cuda')
+  model = resources.NN(middle_width, epochs, mnist_values).to(device=device)
   # initializing the dataframe
   training = resources.mnist_dataset(batch_size, values = mnist_values)
   val = resources.mnist_dataset(batch_size, train=False, values = mnist_values)
