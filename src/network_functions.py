@@ -105,14 +105,14 @@ def kernel_calc(y, phi):
     K1c = kernel_centering(K1.float())
 
     # Feature Kernel
-    K2 = torch.mm(phi, torch.t(phi))
+    K2 = torch.mm(phi, torch.t(phi)).to('cuda')
     K2c = kernel_centering(K2)
 
     return kernel_alignment(K1c, K2c)
 
 
 def frobenius_product(K1, K2):
-    return torch.trace(torch.mm(K2, torch.t(K1)))
+    return torch.trace(torch.mm(K2, torch.t(K1)).to('cuda'))
 
 
 def kernel_alignment(K1, K2):
@@ -122,14 +122,14 @@ def kernel_alignment(K1, K2):
 def kernel_centering(K):
     # Lemmna 1
 
-    m = K.size()[0]
-    I = torch.eye(m)
-    l = torch.ones(m, 1)
+    m = K.size()[0].to('cuda')
+    I = torch.eye(m).to('cuda')
+    l = torch.ones(m, 1).to('cuda')
 
     # I - ll^T / m
-    mat = I - torch.matmul(l, torch.t(l)).to(device='cuda') / m
+    mat = I - torch.matmul(l, torch.t(l)).to('cuda') / m
 
-    return torch.matmul(torch.matmul(mat, K), mat)
+    return torch.matmul(torch.matmul(mat, K).to('cuda'), mat)
 
 
 def ones(vector):
