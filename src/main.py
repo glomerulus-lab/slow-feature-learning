@@ -3,6 +3,7 @@ from network import *
 import torch.nn as nn  # Neural network modules
 import torch.optim as optim  # Optimization algorithms
 import pandas as pd
+import sys
 
 if __name__ == '__main__':
     # Checking & Setting Device Allocation
@@ -16,8 +17,8 @@ if __name__ == '__main__':
         "Num Classes": 2,
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
-        "Batch Size": 200,
-        "Epochs": 3
+        "Batch Size": 2000,
+        "Epochs": 3000
     }
     print(f"Hyper Parameters: {hp}")
 
@@ -31,7 +32,7 @@ if __name__ == '__main__':
                    num_classes=hp["Num Classes"]).to(device=device)
 
     # Loading MNIST Dataset
-    mnist_values = [0, 1]
+    mnist_values = list(map(int, list(sys.argv[1])))
     print(f"MNIST digits {mnist_values}")
     train_loader = mnist_dataset(hp["Batch Size"], values=mnist_values)
     validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_values)
@@ -80,7 +81,7 @@ if __name__ == '__main__':
 
     # Accuracy csv
     complete_array = np.concatenate((slow_accuracy, regular_accuracy), axis=1)
-    complete_dataframe = pd.DataFrame(complete_array).to_csv('../accuracy_metrics'+str(mnist_values))
+    complete_dataframe = pd.DataFrame(complete_array).to_csv('../accuracy_metrics'+sys.argv[1]+sys.argv[2])
     print(f"-Saved accuracy metrics as 'accuracy_metrics{str(mnist_values)}'")
 
     # Saving the entire model
