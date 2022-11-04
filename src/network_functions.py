@@ -100,7 +100,7 @@ def classify_targets(targets, values):
 def kernel_calc(y, phi):
 
     # Output Kernel
-    y = torch.t(torch.unsqueeze(y, -1))
+    y = torch.t(torch.unsqueeze(y, -1)).float()
     K1 = torch.matmul(torch.t(y), y)
     K1c = kernel_centering(K1.float())
 
