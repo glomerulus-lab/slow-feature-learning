@@ -127,7 +127,7 @@ def kernel_centering(K):
     l = torch.ones(m, 1)
 
     # I - ll^T / m
-    mat = I - torch.matmul(l, torch.t(l)) / m
+    mat = I - torch.matmul(l, torch.t(l)).to(device='cuda') / m
 
     return torch.matmul(torch.matmul(mat, K), mat)
 
