@@ -101,7 +101,7 @@ def kernel_calc(y, phi):
 
     # Output Kernel
     y = torch.t(torch.unsqueeze(y, -1)).float()
-    K1 = torch.matmul(torch.t(y), y)
+    K1 = torch.matmul(torch.t(y), y).to('cuda')
     K1c = kernel_centering(K1.float())
 
     # Feature Kernel
