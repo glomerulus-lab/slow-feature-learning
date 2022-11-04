@@ -17,7 +17,7 @@ if __name__ == '__main__':
         "Regular Learning Rate": 0.01,
         "Slow Learning Rate": 0.001,
         "Batch Size": 200,
-        "Epochs": 3000
+        "Epochs": 3
     }
     print(f"Hyper Parameters: {hp}")
 
@@ -31,13 +31,13 @@ if __name__ == '__main__':
                    num_classes=hp["Num Classes"]).to(device=device)
 
     # Loading MNIST Dataset
-    mnist_values = [2, 7]
+    mnist_values = [0, 1]
     print(f"MNIST digits {mnist_values}")
     train_loader = mnist_dataset(hp["Batch Size"], values=mnist_values)
     validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_values)
 
     # Loss function
-    loss_function = nn.CrossEntropyLoss()
+    loss_function = nn.MSELoss()
 
     # Optimizers
     sl_optimizer = optim.SGD([{'params': slow_model.features.hidden_layer.parameters()},
@@ -47,30 +47,28 @@ if __name__ == '__main__':
     r_optimizer = optim.SGD(reg_model.parameters(), lr=hp["Regular Learning Rate"])
 
     # Creating 'empty' arrays for future storing of accuracy metrics
-    slow_accuracy = np.zeros((hp["Epochs"], 5))
-    regular_accuracy = np.zeros((hp["Epochs"], 5))
+    slow_accuracy = np.zeros((hp["Epochs"], 4))
+    regular_accuracy = np.zeros((hp["Epochs"], 4))
 
     print("Training models...")
     for epoch in range(hp["Epochs"]):
 
         # Slow Model
-        sl_mean, sl_ste = train(train_loader, device, slow_model, loss_function, sl_optimizer, values=mnist_values)
-        slow_accuracy[epoch][0] = epoch + 1
-        slow_accuracy[epoch][1] = check_accuracy(device, slow_model, train_loader, mnist_values).cpu()
-        slow_accuracy[epoch][2] = check_accuracy(device, slow_model, validate_loader, mnist_values).cpu()
+        sl_mean = train(train_loader, device, slow_model, loss_function, sl_optimizer, values=mnist_values)
+        slow_accuracy[epoch][0] = epoch
+        slow_accuracy[epoch][1] = check_accuracy(device, slow_model, train_loader, mnist_values)
+        slow_accuracy[epoch][2] = check_accuracy(device, slow_model, validate_loader, mnist_values)
         slow_accuracy[epoch][3] = sl_mean
-        slow_accuracy[epoch][4] = sl_ste
         # CALCULATE THE K.A. AND RECORD IT TO A CSV (FOR SLOW MODEL)
         print("Slow: ")
         print(slow_accuracy[epoch])
 
         # Regular Model
-        reg_mean, reg_ste = train(train_loader, device, reg_model, loss_function, r_optimizer, values=mnist_values)
+        reg_mean = train(train_loader, device, reg_model, loss_function, r_optimizer, values=mnist_values)
         regular_accuracy[epoch][0] = epoch + 1
-        regular_accuracy[epoch][1] = check_accuracy(device, reg_model, train_loader, mnist_values).cpu()
-        regular_accuracy[epoch][2] = check_accuracy(device, reg_model, validate_loader, mnist_values).cpu()
+        regular_accuracy[epoch][1] = check_accuracy(device, reg_model, train_loader, mnist_values)
+        regular_accuracy[epoch][2] = check_accuracy(device, reg_model, validate_loader, mnist_values)
         regular_accuracy[epoch][3] = reg_mean
-        regular_accuracy[epoch][4] = sl_ste
 
 
         # CALCULATE THE K.A. AND RECORD IT TO A CSV (FOR REG MODEL)
@@ -82,8 +80,8 @@ if __name__ == '__main__':
 
     # Accuracy csv
     complete_array = np.concatenate((slow_accuracy, regular_accuracy), axis=1)
-    complete_dataframe = pd.DataFrame(complete_array).to_csv('../accuracy_metrics')
-    print(f"-Saved accuracy metrics as 'accuracy_metrics'")
+    complete_dataframe = pd.DataFrame(complete_array).to_csv('../accuracy_metrics'+str(mnist_values))
+    print(f"-Saved accuracy metrics as 'accuracy_metrics{str(mnist_values)}'")
 
     # Saving the entire model
     torch.save(slow_model.state_dict(), '../slow_model.pt')

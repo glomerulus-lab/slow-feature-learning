@@ -3,6 +3,7 @@ from torch.utils.data import DataLoader  # Minibathces
 import torchvision.datasets as datasets  # MNIST dataset
 import torchvision.transforms as transforms
 import numpy as np
+from torch.nn.functional import one_hot
 
 
 def set_device():
@@ -36,7 +37,8 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
 
         # Forwards.
         scores = model(data)
-        loss = loss_function(scores, classify_targets(targets, values))
+        labels = one_hot(targets.long() % len(values)).to(torch.float32)
+        loss = loss_function(scores, labels)
 
         # Backwards.
         optimizer_function.zero_grad()
@@ -47,7 +49,7 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
 
         kernel_alignments[batch_idx] = kernel_calc(targets, phi)
 
-    return torch.mean(kernel_alignments).item(), torch.std(kernel_alignments).item()/len(kernel_alignments)
+    return torch.mean(kernel_alignments).item()
     # return mean and STD or STE of kernel alignment
 
 
@@ -81,7 +83,7 @@ def check_accuracy(device, model, loader, values=list(range(10))):
             num_correct += (predictions == y).sum()
             num_samples += predictions.size(0)
 
-    return num_correct / num_samples
+    return float(num_correct / num_samples)
 
 
 def classify_targets(targets, values):
