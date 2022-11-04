@@ -122,7 +122,7 @@ def kernel_alignment(K1, K2):
 def kernel_centering(K):
     # Lemmna 1
 
-    m = K.size()[0].to('cuda')
+    m = K.size()[0]
     I = torch.eye(m).to('cuda')
     l = torch.ones(m, 1).to('cuda')
 
