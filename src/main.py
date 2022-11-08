@@ -20,7 +20,7 @@ def store_data(dict, mnist_digits, lr, slr):
     filename = "s" + digits
   else:
     filename = 'r' + digits
-  with open(filename + ".json", "w") as write_file:
+  with open("records/" + filename + ".json", "w") as write_file:
     json.dump(dict, write_file)
 
   
