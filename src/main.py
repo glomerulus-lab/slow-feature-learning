@@ -12,7 +12,7 @@ import resources
 import sys
 import json 
 
-def store_data(dict, mnist_digits, lr, slr):
+def store_data(model, dict, mnist_digits, lr, slr):
   digits = ""
   for v in mnist_digits:
     digits = digits + str(v)
@@ -22,6 +22,7 @@ def store_data(dict, mnist_digits, lr, slr):
     filename = 'r' + digits
   with open("records/" + filename + ".json", "w") as write_file:
     json.dump(dict, write_file)
+  torch.save(model.state_dict(), "models/" + filename)
 
   
 
@@ -62,4 +63,4 @@ if __name__ == '__main__':
     "Validation Accuracy": val_accuracy.tolist()
   }
 
-  store_data(data, sys.argv[1], lr, slr)
+  store_data(model, data, sys.argv[1], lr, slr)
