@@ -46,11 +46,12 @@ class NN(nn.Module):
         for i, (data, targets) in enumerate(loader):
             data = data.reshape(data.shape[0], -1).to(device=self.device)
             targets = targets.to(torch.float32).to(device=self.device)
+            classified_targets = classify_targets(targets, self.values)
 
             # Forwards pass.
             scores = self(data)
 
-            labels = one_hot(targets.long() % len(self.values)).to(torch.float32)
+            labels = one_hot(classified_targets.long(), len(self.values)).to(torch.float32)
             output = loss_function(scores, labels)
 
             # Backwards Pass.
@@ -64,20 +65,21 @@ class NN(nn.Module):
             if record:
                 cka[i] = kernel_calc(self.device, targets, self.features(data).to(device=self.device))
         
-        # Returning the C.K.A. if the option to record was chosen.
+        # Returning the C.K.A. and loss if the option to record was chosen.
         if record:
-            return cka
+            return torch.mean(cka).item(), output
 
 
     def trains(self, training, val, loss_function, optimizer, recordcka=True):
         # Array full of the mean C.K.A. across the the model.
         mcka = torch.zeros(self.epochs).to(device=self.device)
+        loss_array = torch.zeros(self.epochs).to(device=self.device)
         train_accuracy = torch.zeros(self.epochs)
         val_accuracy = torch.zeros(self.epochs)
         for epoch in range(self.epochs):
             # When recordingm run the training & return the C.K.A. 
             if recordcka:
-                mcka[epoch] = torch.mean(self.train_one_epoch(training, loss_function, optimizer)).item()
+                mcka[epoch], loss_array[epoch] = self.train_one_epoch(training, loss_function, optimizer)
                 train_accuracy[epoch] = self.check_accuracy(training)
                 val_accuracy[epoch] = self.check_accuracy(val)
 
@@ -86,19 +88,10 @@ class NN(nn.Module):
             else: train_one_epoch(training, loss_function, optimizer, record=False)
         
         if recordcka:
-            return mcka, train_accuracy, val_accuracy
+            return mcka, loss_array, train_accuracy, val_accuracy
         else: 
             return train_accuracy, val_accuracy
 
-    def classify_targets(self, targets):
-        new_targets = targets.clone()
-    
-        # Changing targets to a classifiable number.
-        for key, element in enumerate(self.values):
-            new_targets[targets == element] = key
-        return new_targets
-    
- 
     def check_accuracy(self, loader):
         correct = 0 
         samples = 0
@@ -107,7 +100,7 @@ class NN(nn.Module):
         with torch.no_grad():
             for x, y in loader:
                 x = x.to(device=self.device)
-                y = self.classify_targets(y).to(device=self.device)
+                y = classify_targets(y, self.values).to(device=self.device)
                 x = x.reshape(x.shape[0], -1)
                 
                 # 64images x 10
@@ -117,6 +110,14 @@ class NN(nn.Module):
                 correct += (predictions == y).sum()
                 samples += predictions.size(0)
         return correct / samples
+
+def classify_targets(targets, values):
+    new_targets = targets.clone()
+
+    # Changing targets to a classifiable number.
+    for key, element in enumerate(values):
+        new_targets[targets == element] = key
+    return new_targets
 
 def kernel_calc(device, y, phi):
 
