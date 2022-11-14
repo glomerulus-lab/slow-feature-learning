@@ -55,10 +55,11 @@ if __name__ == '__main__':
   loss = nn.MSELoss()
 
   # Training the model
-  cka, train_accuracy, val_accuracy = model.trains(training, val, loss, optimizer)
+  cka, loss_values, train_accuracy, val_accuracy = model.trains(training, val, loss, optimizer)
   
   data = {
     "Centered Kernel Alignment": cka.tolist(),
+    "Loss": loss_values.tolist(),
     "Training Accuracy": train_accuracy.tolist(),
     "Validation Accuracy": val_accuracy.tolist()
   }
