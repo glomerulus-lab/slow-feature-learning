@@ -20,11 +20,17 @@ def store_data(model, dict, mnist_digits, lr, slr):
     filename = "s" + digits
   else:
     filename = 'r' + digits
-  with open("records/" + filename + ".json", "w") as write_file:
-    json.dump(dict, write_file)
+  writeJson(filename, "records/", dict) 
   torch.save(model.state_dict(), "models/" + filename)
 
-  
+def writeJson(file_name, path, dict, i = 0):
+  try:
+    with open(path + file_name + ".json", 'x') as write_file:
+      json.dump(dict, write_file)
+      return
+  except:
+    file_name = file_name + '(1)'
+    writeJson(file_name, path, dict)
 
 if __name__ == '__main__':
 
@@ -58,6 +64,7 @@ if __name__ == '__main__':
   cka, loss_values, train_accuracy, val_accuracy = model.trains(training, val, loss, optimizer)
   
   data = {
+    "Hyper Parameters": sys.argv,
     "Centered Kernel Alignment": cka.tolist(),
     "Loss": loss_values.tolist(),
     "Training Accuracy": train_accuracy.tolist(),
