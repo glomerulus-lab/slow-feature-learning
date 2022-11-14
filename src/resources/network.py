@@ -83,7 +83,7 @@ class NN(nn.Module):
                 train_accuracy[epoch] = self.check_accuracy(training)
                 val_accuracy[epoch] = self.check_accuracy(val)
 
-                print(f"Epoch {str(epoch)} | {round(mcka[epoch].item(), 5)} | {round(train_accuracy[epoch].item(), 5)} | {round(val_accuracy[epoch].item(), 5)}")
+                print(f"Epoch {str(epoch)} | {round(mcka[epoch].item(), 5)} |  {round(train_accuracy[epoch].item(), 5)} |  {round(val_accuracy[epoch].item(), 5)} |  {round(loss_array[epoch].item(), 5)} |")
             # No record case.
             else: train_one_epoch(training, loss_function, optimizer, record=False)
         
