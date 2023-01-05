@@ -77,7 +77,7 @@ class NN(nn.Module):
         train_accuracy = torch.zeros(self.epochs)
         val_accuracy = torch.zeros(self.epochs)
         for epoch in range(self.epochs):
-            # When recordingm run the training & return the C.K.A. 
+            # When recordingm run the training & return the C.K.A. vscode-webview://0bm4uprhkg52mmr7vium9nga5jcrc0dn92tudork25mj1fldr2r7/8965e2ae-b776-4248-8cb2-40a5f61bb8aa
             if recordcka:
                 mcka[epoch], loss_array[epoch] = self.train_one_epoch(training, loss_function, optimizer)
                 train_accuracy[epoch] = self.check_accuracy(training)
