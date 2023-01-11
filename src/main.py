@@ -12,63 +12,57 @@ import resources
 import sys
 import json 
 
-def store_data(model, dict, mnist_digits, lr, slr):
-  digits = ""
-  for v in mnist_digits:
-    digits = digits + str(v)
-  if lr != slr:
-    filename = "s" + digits
-  else:
-    filename = 'r' + digits
-  writeJson(filename, "records/", dict) 
-  torch.save(model.state_dict(), "models/" + filename)
-
-def writeJson(file_name, path, dict, i = 0):
-  try:
-    with open(path + file_name + ".json", 'x') as write_file:
-      json.dump(dict, write_file)
-      return
-  except:
-    file_name = file_name + '(1)'
-    writeJson(file_name, path, dict)
-
 if __name__ == '__main__':
 
-  # Hyper parameters
-  print(sys.argv[1])
-  mnist_values = list(map(int, list(sys.argv[1])))
-  middle_width = int(sys.argv[2])
-  epochs = int(sys.argv[3])
-  batch_size = int(sys.argv[4])
-  lr = float(sys.argv[5])
-  if sys.argv[6] is None: 
-    slr = lr
-  else:
-     slr = float(sys.argv[6])
-  
-  device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-  # initializing the model
-  model = resources.NN(middle_width, epochs, mnist_values).to(device=device)
-  # initializing the dataframe
-  training = resources.mnist_dataset(batch_size, values = mnist_values)
-  val = resources.mnist_dataset(batch_size, train=False, values = mnist_values)
-  # optimizer
-  optimizer = optim.SGD([{'params': model.features.hidden_layer.parameters()},
-                            {'params': model.readout.parameters(),
-                             'lr': lr}],
-                           lr=slr)
-  # loss 
-  loss = nn.MSELoss()
+	# Setting model to train on GPU (if available).
+	device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-  # Training the model
-  cka, loss_values, train_accuracy, val_accuracy = model.trains(training, val, loss, optimizer)
-  
-  data = {
-    "Hyper Parameters": sys.argv,
-    "Centered Kernel Alignment": cka.tolist(),
-    "Loss": loss_values.tolist(),
-    "Training Accuracy": train_accuracy.tolist(),
-    "Validation Accuracy": val_accuracy.tolist()
-  }
+	hyper_params = {
+		"input_size": 784,
+		"middle_width": 10,
+		"classes": 2,
+		"learning_rate": 0.1,
+		"readout_learning_rate": 0.1,
+		"batch_size": 10,
+		"epochs": 4 
+	}
 
-  store_data(model, data, sys.argv[1], lr, slr)
+	# Initialling model
+	model = NN(middle_width=hp["middle_width"],
+			   classes=hp["classes"])
+
+	mnist_values = []
+
+	# TODO TURN TO A FUNCTION
+	train_loader = mnist_dataset(hp["batch_size", True, mnist_values])
+	val_loader = mnist_dataset(hp["batch_size", False, mnist_values])
+
+	# Loss function 
+	loss_function = nn.MSELoss()
+
+	# Optimizer
+	optimizer = optim.SGD([{"params": model.features.hidden_layer.parameters()},
+							{"params": model.readout.parameters(),
+							"lr": hp["learning_rate"]}],
+							lr= hp["readout_learning_rate"])
+	
+	# Training Model
+	for epoch in range(hp["Epochs"]):
+
+		printf("Epoch: {epoch}")
+
+		# TODO CREATE CHECKPOINT TO STORE MODEL
+
+		for batch_idx, (data, targets) in enumerate(train_loader):
+			data = data.reshape(data.shape[0], -1).to(device = device)
+			labels = classify(targets, values)
+
+			# Forwards pass.
+			scores = model(data)
+			loss = loss_function(scores, labels)
+
+			# Backwards pass.
+			optimizer.zero_grad()
+			loss.backward()
+
+			optimizer.step()

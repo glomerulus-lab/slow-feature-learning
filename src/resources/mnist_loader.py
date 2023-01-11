@@ -11,7 +11,7 @@ from torch.utils.data import DataLoader
 
 def mnist_dataset(batch_size, train=True, values=list(range(10))):
     # Initializing MNIST data set.
-    dataset = datasets.MNIST(root='dataset/', train=train, transform=transforms.ToTensor(), download=True)
+    dataset = datasets.MNIST(root='dataset/', train=train, transform=transforms.ToTensor(), download=False)
 
     targets_list = dataset.targets.tolist()
     values_index = [i for i in range(len(dataset)) if targets_list[i] in values]
