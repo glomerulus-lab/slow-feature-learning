@@ -1,79 +1,67 @@
-from network_functions import *
-from network import *
+"""
+Training Script For Slow Feature Learning Project
+Author: Cameron Kaminski
+"""
+from resources import *
 import torch.nn as nn  # Neural network modules
 import torch.optim as optim  # Optimization algorithms
-import pandas as pd
+from torch.nn.functional import one_hot
 
 if __name__ == '__main__':
-    # Checking & Setting Device Allocation
-    device = set_device()
-    print(f"Running on {device}")
 
-    # Hyper Parameters
-    hp = {
-        "Input Size": 784,
-        "Middle Layer Width": 2000,
-        "Num Classes": 2,
-        "Regular Learning Rate": 0.1,
-        "Slow Learning Rate": 0.01,
-        "Batch Size": 200,
-        "Epochs": 10
-    }
-    print(f"Hyper Parameters: {hp}")
+    # Checking & Setting Device Allocation.
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    # Initializing Model
-    slow_model = NN(input_size=hp["Input Size"],
-                    middle_width=hp["Middle Layer Width"],
-                    num_classes=hp["Num Classes"]).to(device=device)
+    # Hyper params..
+    hp = read_hyperparams('hyper-parameters/hyperparams.txt')
 
-    reg_model = NN(input_size=hp["Input Size"],
-                   middle_width=hp["Middle Layer Width"],
-                   num_classes=hp["Num Classes"]).to(device=device)
+    # Initializing models:
+    model = NN(hp['input'], hp['ml_width']).to(device)
 
-    # Loading MNIST Dataset
-    mnist_values = [2, 8]
-    print(f"MNIST digits {mnist_values}")
-    train_loader = mnist_dataset(hp["Batch Size"], values=mnist_values)
-    validate_loader = mnist_dataset(hp["Batch Size"], train=False, values=mnist_values)
+    # Loading MNist dataset
+    mnist_values = [0, 1]
+    train = mnist_dataset(hp['batch_size'], values=mnist_values)
+    val = mnist_dataset(hp['batch_size'], values=mnist_values)
 
     # Loss function
-    loss_function = nn.CrossEntropyLoss()
+    loss = nn.MSELoss()
 
     # Optimizers
-    sl_optimizer = optim.SGD([{'params': slow_model.features.hidden_layer.parameters()},
-                              {'params': slow_model.features.readout.parameters(),
-                               'lr': hp["Regular Learning Rate"]}],
-                             lr=hp["Slow Learning Rate"])
-    r_optimizer = optim.SGD(reg_model.parameters(), lr=hp["Regular Learning Rate"])
+    optimizer = optim.SGD([{'params': model.features.hidden_layer.parameters()},
+                           {'params': model.readout.parameters(),
+                            'lr': hp['learning_rate']}],
+                          lr=hp['slow_learning_rate'])
 
-    # Creating 'empty' arrays for future storing of accuracy metrics
-    slow_accuracy = np.zeros((1, 3))
-    regular_accuracy = np.zeros((1, 3))
+    loss_function = nn.MSELoss()
 
-    print("Training models...")
-    for epoch in range(hp["Epochs"]):
+    # Training the Model.
+    print(f"Training the model on {device} for {mnist_values} with HP: /n"
+          f"learning rate = {hp['learning_rate']}\n"
+          f"slow learning rate = {hp['slow_learning_rate']}\n"
+          f"batch size = {hp['batch_size']}\n"
+          f"epochs = {hp['epochs']}\n")
 
-        # Slow Model
-        train(train_loader, device, slow_model, loss_function, sl_optimizer, values=mnist_values)
-        slow_accuracy_epoch = record_accuracy(device, slow_model, train_loader, validate_loader, epoch, mnist_values)
-        print(slow_accuracy_epoch)
-        slow_accuracy = np.concatenate((slow_accuracy, slow_accuracy_epoch))
+    for epoch in range(hp['epochs']):
 
-        # Regular Model
-        train(train_loader, device, reg_model, loss_function, r_optimizer, values=mnist_values)
-        regular_accuracy_epoch = record_accuracy(device, reg_model, train_loader, validate_loader, epoch, mnist_values)
-        print(regular_accuracy_epoch)
-        regular_accuracy = np.concatenate((regular_accuracy, regular_accuracy_epoch))
+        for batch_idx, (data, targets) in enumerate(train):
+            data = data.reshape(data.shape[0], -1).to(device=device)
+            targets = targets.to(device=device)
+            classified_targets = classify_targets(targets, mnist_values)
 
-        print(f"-Finished epoch {epoch + 1}/{hp['Epochs']}")
 
-    # Accuracy csv
-    complete_array = np.concatenate((slow_accuracy, regular_accuracy), axis=1)
-    complete_dataframe = pd.DataFrame(complete_array).to_csv('../accuracy_metrics')
-    print(f"-Saved accuracy metrics as 'accuracy_metrics'")
+            # Forwards
+            scores = model(data)
 
-    # Saving the entire model
-    torch.save(slow_model.state_dict(), '../slow_model.pt')
-    print(f"-Saved Regular Model Parameters as 'slow_model.pt'")
-    torch.save(reg_model.state_dict(), '../reg_model.pt')
-    print(f"-Saved Regular Model Parameters as 'reg_model.pt'")
+            labels = one_hot(classified_targets.long(), len(mnist_values)).to(torch.float32)
+            loss = loss_function(scores, labels)
+
+            # Backwards
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+        torch.save(model, './models/model' + str(epoch) + '.pth')
+        print(f"Epoch: {epoch} | Accuracy: {check_accuracy(model, val, mnist_values, device)}")
+
+
+    print("Training completed.")
