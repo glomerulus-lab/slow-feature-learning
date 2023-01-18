@@ -1,0 +1,6 @@
+mnist_values 27
+ml_width 20
+learning_rate 0.01
+slow_learning_rate 0.001
+bath_size 100
+epochs 10
