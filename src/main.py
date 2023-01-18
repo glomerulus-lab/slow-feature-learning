@@ -13,13 +13,19 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Hyper params..
-    hp = read_hyperparams('hyper-parameters/hyperparams.txt')
+    # hp = read_hyperparams('hyper-parameters/hyperparams.txt')
+    hp = {"ml_width": 20,
+          "learning_rate": 0.01,
+          "slow_learning_rate": 0.01,
+          "batch_size": 100,
+          "epochs": 10}
+
+    mnist_values = [2, 7]
 
     # Initializing models:
-    model = NN(hp['input'], hp['ml_width']).to(device)
+    model = NN(hp['ml_width'], len(mnist_values)).to(device)
 
     # Loading MNist dataset
-    mnist_values = [0, 1]
     train = mnist_dataset(hp['batch_size'], values=mnist_values)
     val = mnist_dataset(hp['batch_size'], values=mnist_values)
 
@@ -35,7 +41,7 @@ if __name__ == '__main__':
     loss_function = nn.MSELoss()
 
     # Training the Model.
-    print(f"Training the model on {device} for {mnist_values} with HP: /n"
+    print(f"Training the model on {device} for {mnist_values} with HP: \n"
           f"learning rate = {hp['learning_rate']}\n"
           f"slow learning rate = {hp['slow_learning_rate']}\n"
           f"batch size = {hp['batch_size']}\n"
