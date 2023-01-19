@@ -2,6 +2,16 @@
 TXT File Reader Functions
 """
 
+"""
+Reads the hyper parameters from a txt file.
+The TXT file must follow the following format:
+    mnist_values <value1> <value2>
+    ml_width <value>
+    learning_rate <value>
+    slow_learning_rate <value>
+    batch_size <value>
+    epochs <value>
+"""
 def read_hyperparams(filepath):
     hyper_params = {"mnist_values": [],
                     "ml_width": None,
