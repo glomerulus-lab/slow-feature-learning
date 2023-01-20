@@ -1,0 +1,1 @@
+mnist_values 27ml_width 20learning_rate 0.01slow_learning_rate 0.001batch_size 100epochs 10title xxxxxxxxx

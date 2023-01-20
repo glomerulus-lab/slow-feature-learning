@@ -24,13 +24,15 @@ def read_hyperparams(filepath):
         for line in file:
             try:
                 key, value = line.strip().split()
-                hyper_params[key] = float(value)
+                hyper_params[key] = value
             except:
                 key, value1, value2 = line.strip().split()
                 hyper_params[key] = [int(value1), int(value2)]
                 continue
 
     hyper_params['ml_width'] = int(hyper_params['ml_width'])
+    hyper_params['learning_rate'] = float(hyper_params['learning_rate'])
+    hyper_params['slow_learning_rate'] = float(hyper_params['slow_learning_rate'])
     hyper_params['batch_size'] = int(hyper_params['batch_size'])
     hyper_params['epochs'] = int(hyper_params['epochs'])
 

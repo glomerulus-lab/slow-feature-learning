@@ -6,6 +6,7 @@ from resources import *
 import torch.nn as nn  # Neural network modules
 import torch.optim as optim  # Optimization algorithms
 from torch.nn.functional import one_hot
+import os
 
 if __name__ == '__main__':
 
@@ -13,21 +14,23 @@ if __name__ == '__main__':
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     # Hyper params..
-    # hp = read_hyperparams('hyper-parameters/hyperparams.txt')
-    hp = {"ml_width": 20,
-          "learning_rate": 0.01,
-          "slow_learning_rate": 0.01,
-          "batch_size": 100,
-          "epochs": 10}
+    hp = read_hyperparams('hyper-parameters/hyperparams.txt')
 
-    mnist_values = [2, 7]
+    # Creating a dir to save the model.
+    if not os.path.exists(hp['title']):
+        os.mkdir(hp['title'])
+
+    # Saving a copy of the hyper params to a txt file inside the model storage dir.
+    with open("hyeperparams.txt", mode="w") as f:
+        for key, value in hp.items():
+            f.write(f"{key} {value}")
 
     # Initializing models:
-    model = NN(hp['ml_width'], len(mnist_values)).to(device)
+    model = NN(hp['ml_width'], len(hp['mnist_values'])).to(device)
 
     # Loading MNist dataset
-    train = mnist_dataset(hp['batch_size'], values=mnist_values)
-    val = mnist_dataset(hp['batch_size'], values=mnist_values)
+    train = mnist_dataset(hp['batch_size'], values=hp['mnist_values'])
+    val = mnist_dataset(hp['batch_size'], values=hp['mnist_values'])
 
     # Loss function
     loss = nn.MSELoss()
@@ -41,7 +44,7 @@ if __name__ == '__main__':
     loss_function = nn.MSELoss()
 
     # Training the Model.
-    print(f"Training the model on {device} for {mnist_values} with HP: \n"
+    print(f"Training the model on {device} for {hp['mnist_values']} with HP: \n"
           f"learning rate = {hp['learning_rate']}\n"
           f"slow learning rate = {hp['slow_learning_rate']}\n"
           f"batch size = {hp['batch_size']}\n"
@@ -52,13 +55,13 @@ if __name__ == '__main__':
         for batch_idx, (data, targets) in enumerate(train):
             data = data.reshape(data.shape[0], -1).to(device=device)
             targets = targets.to(device=device)
-            classified_targets = classify_targets(targets, mnist_values)
+            classified_targets = classify_targets(targets, hp['mnist_values'])
 
 
             # Forwards
             scores = model(data)
 
-            labels = one_hot(classified_targets.long(), len(mnist_values)).to(torch.float32)
+            labels = one_hot(classified_targets.long(), len(hp['mnist_values'])).to(torch.float32)
             loss = loss_function(scores, labels)
 
             # Backwards
@@ -66,8 +69,8 @@ if __name__ == '__main__':
             loss.backward()
             optimizer.step()
 
-        torch.save(model, './models/model' + str(epoch) + '.pth')
-        print(f"Epoch: {epoch} | Accuracy: {check_accuracy(model, val, mnist_values, device)}")
+        torch.save(model, './models/' + hp['title'] + '/model' + str(epoch) + '.pth')
+        print(f"Epoch: {epoch} | Accuracy: {check_accuracy(model, val, hp['mnist_values'], device)}")
 
 
     print("Training completed.")
