@@ -1,6 +1,6 @@
 from network_functions import *
 import os
-from numba import jit
+import time
 from argparser import parseHyperparams
 from network import *
 import torch.nn as nn  # Neural network modules
@@ -39,8 +39,11 @@ if __name__ == '__main__':
 
     print("Training models...")
     for epoch in range(hyper_params.epochs):
-
+        start_time = time.time()
         train(train_loader, device, model, loss_function, optimizer, values=hyper_params.mnist_values)
+        end_time = time.time()
+
+        print(f"Time taken for epoch {epoch + 1} is {end_time - start_time} seconds")
 
         accuracy[epoch][0] = epoch + 1
         accuracy[epoch][1] = check_accuracy(device, model, train_loader, hyper_params.mnist_values).cpu()

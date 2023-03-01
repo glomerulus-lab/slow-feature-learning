@@ -3,7 +3,8 @@ from torch.utils.data import DataLoader  # Minibathces
 import torchvision.datasets as datasets  # MNIST dataset
 import torchvision.transforms as transforms
 import numpy as np
-
+from torch.nn.functional import one_hot
+import numba
 
 def set_device():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -24,6 +25,7 @@ def mnist_dataset(batch_size, train=True, values=list(range(10))):
     return loader
 
 
+@torch.jit.script
 def train(loader, device, model, loss_function, optimizer_function, values=list(range(10))):
     # Training on each data point.
 
@@ -36,7 +38,9 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
 
         # Forwards.
         scores = model(data)
-        loss = loss_function(scores, classify_targets(targets, values))
+        labels = classify_targets(targets, values).long()
+        labels = one_hot(labels, len(values)).to(dtype=torch.float)
+        loss = loss_function(scores, labels)
 
         # Backwards.
         optimizer_function.zero_grad()
@@ -90,7 +94,7 @@ def classify_targets(targets, values):
     return new_targets
 
 
-# Kernel Alignment Fucntions
+# Kernel Alignment Functions
 
 def kernel_calc(y, phi):
 
