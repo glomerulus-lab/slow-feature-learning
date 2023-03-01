@@ -47,9 +47,6 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
 
         kernel_alignments[batch_idx] = kernel_calc(targets, phi)
 
-    return torch.mean(kernel_alignments).item(), torch.std(kernel_alignments).item()/len(kernel_alignments)
-    # return mean and STD or STE of kernel alignment
-
 
 def record_accuracy(device, model, train_loader, test_loader, epoch, ste, mean, values=list(range(10))):
     epoch_accuracy = np.array([[
