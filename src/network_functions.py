@@ -25,12 +25,8 @@ def mnist_dataset(batch_size, train=True, values=list(range(10))):
     return loader
 
 
-@torch.jit.script
 def train(loader, device, model, loss_function, optimizer_function, values=list(range(10))):
     # Training on each data point.
-
-    # Set array full of zeros.
-    kernel_alignments = torch.zeros(len(loader))
 
     for batch_idx, (data, targets) in enumerate(loader):
         data = data.reshape(data.shape[0], -1).to(device=device)
@@ -48,8 +44,6 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
 
         optimizer_function.step()
         phi = model.features(data)
-
-        kernel_alignments[batch_idx] = kernel_calc(targets, phi)
 
 
 def record_accuracy(device, model, train_loader, test_loader, epoch, ste, mean, values=list(range(10))):
