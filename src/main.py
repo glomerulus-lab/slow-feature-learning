@@ -5,7 +5,6 @@ from argparser import parseHyperparams
 from network import *
 import torch.nn as nn  # Neural network modules
 import torch.optim as optim  # Optimization algorithms
-import pandas as pd
 
 if __name__ == '__main__':
     # Checking & Setting Device Allocation
