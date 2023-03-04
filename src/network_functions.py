@@ -43,7 +43,6 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
         loss.backward()
 
         optimizer_function.step()
-        phi = model.features(data)
 
 
 def record_accuracy(device, model, train_loader, test_loader, epoch, ste, mean, values=list(range(10))):
