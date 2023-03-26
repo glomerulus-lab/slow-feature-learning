@@ -11,7 +11,9 @@ for i in "${!digits[@]}"; do
       mnist_values="${digits[i]} ${digits[j]}"
 
       # Run main.py with the specified arguments and current mnist_values pair
-      python3 main.py --batch_size 64 --epochs 1 --regular_lr 0.1 --slow_lr 0.1 --mnist_values $mnist_values
+      python3 main.py --batch_size 64 --epochs 3000 --regular_lr 0.1 --slow_lr 0.1 --mnist_values $mnist_values
+      python3 main.py --batch_size 64 --epochs 3000 --regular_lr 0.1 --slow_lr 0.01 --mnist_values $mnist_values
+      python3 main.py --batch_size 64 --epochs 3000 --regular_lr 0.1 --slow_lr 0.001 --mnist_values $mnist_values
     fi
   done
 done

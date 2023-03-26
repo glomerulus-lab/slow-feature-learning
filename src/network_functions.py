@@ -4,7 +4,6 @@ import torchvision.datasets as datasets  # MNIST dataset
 import torchvision.transforms as transforms
 import numpy as np
 from torch.nn.functional import one_hot
-import numba
 
 def set_device():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

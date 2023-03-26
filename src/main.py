@@ -21,6 +21,7 @@ if __name__ == '__main__':
 
     # Parsing Hyperparameters from the system arguments.
     hyper_params = parseHyperparams()
+    print(f"Hyper params : {hyper_params}")
 
     # Creating the model save directory
     print(os.getcwd())
@@ -56,13 +57,16 @@ if __name__ == '__main__':
 
     # Training the model over each epoch
     for epoch in range(hyper_params.epochs):
+        print(f"Epoch : {epoch}")
 
         # Training the model over each batch
         train(train_loader, device, model, loss_function, optimizer,
               values=hyper_params.mnist_values)
 
         # Saving the entire model
-        torch.save(model.state_dict(), dir_path + "/model" + '{:04d}'.format(epoch) + ".pt")
+        if (epoch % 4 == 0):
+            quantized_model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
+            torch.save(quantized_model.state_dict(), dir_path + "/model" + '{:04d}'.format(epoch) + ".pt")
 
     end_time = time.time()
 
