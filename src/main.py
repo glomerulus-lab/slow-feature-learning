@@ -1,7 +1,6 @@
 #
-#
-#
-#
+# MODEL TRAINING
+# BY : CAMERON KAMINSKI
 #
 
 
@@ -25,9 +24,13 @@ if __name__ == '__main__':
 
     # Creating the model save directory
     print(os.getcwd())
+
     dir_path = str("model-saves/" + str(hyper_params.regular_lr) + '_'
-               + str(hyper_params.slow_lr) + '_' + str(hyper_params.mnist_values[0])
-               + str(hyper_params.mnist_values[1]))
+               + str(hyper_params.slow_lr) +
+               '_' +
+               str(hyper_params.mnist_values[0]) +
+               str(hyper_params.mnist_values[1]))
+
     j = 0
     while os.path.exists(dir_path):
         dir_path += str(j)
@@ -65,14 +68,25 @@ if __name__ == '__main__':
 
         # Saving the entire model
         if (epoch % 4 == 0):
-            quantized_model = torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)
-            torch.save(quantized_model.state_dict(), dir_path + "/model" + '{:04d}'.format(epoch) + ".pt")
+
+            quantized_model = torch.quantization.quantize_dynamic(
+                model,
+                {torch.nn.Linear},
+                dtype=torch.qint8)
+
+            torch.save(quantized_model.state_dict(), dir_path + 
+            "/model" +
+            '{:04d}'.format(epoch) +
+            ".pt")
 
     end_time = time.time()
 
     # Creating a .txt file to store the hyperparameters.
     with open(dir_path + '/hyperparams.txt', 'w') as f:
         f.write("Hyperparameters: " +
-                str({hyper_param: getattr(hyper_params, hyper_param) for hyper_param in vars(hyper_params)}))
+                str({hyper_param: 
+                getattr(hyper_params, hyper_param) for hyper_param in vars(
+                hyper_params)}))
+
         f.write("\nDATE TIME : " + str(datetime.datetime.now()))
         f.write("\nRUNTIME: " + str(end_time - start_time))
