@@ -1,0 +1,3 @@
+Hyperparameters: {'input_size': 784, 'middle_width': 1024, 'num_classes': 2, 'batch_size': 128, 'epochs': 2048, 'regular_lr': 0.1, 'slow_lr': 0.001, 'mnist_values': [1, 2]}
+DATE TIME : 2023-03-26 11:46:35.680370
+RUNTIME: 1932.929105758667
