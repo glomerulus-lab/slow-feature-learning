@@ -5,6 +5,7 @@ import torchvision.transforms as transforms
 import numpy as np
 from torch.nn.functional import one_hot
 
+
 def set_device():
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     return device
@@ -13,6 +14,9 @@ def set_device():
 def mnist_dataset(batch_size, train=True, values=list(range(10))):
     # Initializing MNIST data set.
     dataset = datasets.MNIST(root='dataset/', train=train, transform=transforms.ToTensor(), download=True)
+
+    if batch_size == 0:
+        batch_size = len(dataset)
 
     targets_list = dataset.targets.tolist()
     values_index = [i for i in range(len(dataset)) if targets_list[i] in values]
@@ -89,7 +93,6 @@ def classify_targets(targets, values):
 # Kernel Alignment Functions
 
 def kernel_calc(y, phi):
-
     # Output Kernel
     y = torch.t(torch.unsqueeze(y, -1))
     K1 = torch.matmul(torch.t(y), y)

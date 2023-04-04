@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 class NN(nn.Module):
 
-    def __init__(self, input_size, middle_width, num_classes):
+    def __init__(self, input_size=784, middle_width=2048, num_classes=2):
 
 
         super(NN, self).__init__()
