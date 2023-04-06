@@ -4,10 +4,11 @@
 # 
 
 import torch
-import numpy as np
-import resources as rs
+import os
+from .network import NN
 
-def load_model(lr : float, slr : float, digits : (int, int), epoch : int):
+
+def load_model(lr: float, slr: float, digits: (int, int), epoch: int) -> NN:
     """
     Takes model specifications (i.e. learning rates and digit pair), then loads
     the pytorch model for the specified epoch.
@@ -16,17 +17,30 @@ def load_model(lr : float, slr : float, digits : (int, int), epoch : int):
     :param slr: slow learning rate
     :param digits: digits used on model
     :param epoch: epoch that model was saved on
-    :return: PyTorch model for the specifed model
+    :return: PyTorch model for the specified model
     :rtype: torch.nn
     """
 
-    PATH = "/model-saves" + 
-        str(lr) + '_' + str(slr) + '_' + str(digits(0)) + str(digits(1)) +
-        "{:04d}".format(epoch)
+    path = ("/model-saves" +
+            str(lr) + '_' + str(slr) + '_' + str(digits(0)) + str(digits(1)) +
+            "{:04d}".format(epoch))
 
-    model_state = torch.load(PATH)
-    model = rs.NN(input_size=784, middle_width=2048, num_classes=2)
+    torch.load(path)
+    model = NN(input_size=784, middle_width=2048, num_classes=2)
 
     return model
-    
 
+
+def get_model_saves(directory: str) -> list[str]:
+    """
+    Returns a list of all the model saves in the specified directory.
+
+    :param directory: root directory to search for model saves
+    :return paths: list of paths to model saves
+    """
+    paths = []
+    for root, dirs, files in os.walk(directory):
+        for file in files:
+            if file.endswith(".pt"):
+                paths.append(os.path.join(root, file))
+    return paths
