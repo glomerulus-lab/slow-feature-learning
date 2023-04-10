@@ -33,7 +33,7 @@ def load_model(lr: float, slr: float, digits: (int, int), epoch: int) -> NN:
 
 def get_model_saves(directory: str) -> list[str]:
     """
-    Returns a list of all the model saves in the specified directory.
+    Returns a list of all the model saves in the specified directory accessible from the current program's directory.
 
     :param directory: root directory to search for model saves
     :return paths: list of paths to model saves
