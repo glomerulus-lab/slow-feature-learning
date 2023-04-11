@@ -28,7 +28,8 @@ def mnist_dataset(batch_size, train=True, values=list(range(10))):
     return loader
 
 
-def train(loader, device, model, loss_function, optimizer_function, values=list(range(10))):
+def train(loader, device, model, loss_function, optimizer_function=None, values=list(range(10)), forwards=True,
+          backwards=True, record_loss=False):
     # Training on each data point.
 
     for batch_idx, (data, targets) in enumerate(loader):
@@ -36,16 +37,21 @@ def train(loader, device, model, loss_function, optimizer_function, values=list(
         targets = targets.to(device=device)
 
         # Forwards.
-        scores = model(data)
-        labels = classify_targets(targets, values).long()
-        labels = one_hot(labels, len(values)).to(dtype=torch.float)
-        loss = loss_function(scores, labels)
+        if forwards:
+            scores = model(data)
+            labels = classify_targets(targets, values).long()
+            labels = one_hot(labels, len(values)).to(dtype=torch.float)
+            loss = loss_function(scores, labels)
+            if record_loss: losses = loss.item()
 
         # Backwards.
-        optimizer_function.zero_grad()
-        loss.backward()
+        if backwards:
+            optimizer_function.zero_grad()
+            loss.backward()
 
-        optimizer_function.step()
+            optimizer_function.step()
+
+    if record_loss: return losses
 
 
 def record_accuracy(device, model, train_loader, test_loader, epoch, ste, mean, values=list(range(10))):
