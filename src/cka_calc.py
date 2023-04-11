@@ -11,8 +11,11 @@ from resources import kernel_calc
 from resources import get_model_saves
 from resources import set_device
 from resources import train
+from resources import NN
 import torch
 import torch.nn as nn
+
+device = set_device()
 
 # Load MNIST dataset 
 MNIST = mnist_dataset(batch_size=0, train=True, values=[0, 1])
@@ -31,14 +34,15 @@ ckas = torch.zeros(num_models)
 i = 0
 for model_path in model_paths:
 
-    device = set_device()
+    print(model_path)
 
     if model_path[-15:-13] != MNIST_values:
         MNIST_values = model_path[-15:-13]
         digits = [int(char) for char in model_path[-15:-13]]
         MNIST = mnist_dataset(batch_size=0, train=True, values=digits)
+        print("GETTING NEW DATASET FOR DIGITS {digits}")
 
-    state_dict = torch.load(model_path, map_location=torch.device('cpu'))
+    state_dict = torch.load(model_path, map_location=device)
 
     # get the weights and biases of the quantized model (for the features layer)
     f_weights_quant = state_dict[
@@ -67,14 +71,14 @@ for model_path in model_paths:
     params[3].data = r_bias_float
 
     # Getting CKA
-    cka = kernel_calc(targets, data)
+    cka = kernel_calc(targets, model.features(data))
 
     # Getting Loss
     model.eval()
-    loss = train(MNIST, model, device, nn.MSELoss(), values=digits, backwards=False, record_loss=True)
+    loss = train(loader=MNIST, model=model, device=device, loss_function=nn.MSELoss(), values=digits, backwards=False, record_loss=True)
 
     losses[i] = loss
     ckas[i] = cka
 
-    print(f"Model {i} / {num_models} : Loss = {loss:.4f}, CKA = {cka:.4f}")
+    print(f"Model {i} / {num_models} : Loss = {loss:.8f}, CKA = {cka:.8f}")
     i += 1
