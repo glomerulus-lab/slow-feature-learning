@@ -31,6 +31,9 @@ num_models = len(model_paths)
 losses = torch.zeros(num_models)
 ckas = torch.zeros(num_models)
 
+model = NN()
+params = list(model.parameters())
+
 i = 0
 for model_path in model_paths:
 
@@ -63,8 +66,6 @@ for model_path in model_paths:
     r_bias_float = torch.dequantize(r_bias_quant)
 
     # Maunally update the model weights 
-    model = NN()
-    params = list(model.parameters())
     params[0].data = f_weights_float
     params[1].data = f_bias_float
     params[2].data = r_weights_float
