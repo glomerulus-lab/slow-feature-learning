@@ -12,6 +12,7 @@ from resources import get_model_saves
 from resources import set_device
 from resources import train
 from resources import NN
+import time
 import torch
 import torch.nn as nn
 
@@ -39,12 +40,17 @@ for model_path in model_paths:
 
     print(model_path)
 
+    start_time = time.time()
+    # load the model
     if model_path[-15:-13] != MNIST_values:
         MNIST_values = model_path[-15:-13]
         digits = [int(char) for char in model_path[-15:-13]]
         MNIST = mnist_dataset(batch_size=0, train=True, values=digits)
         print("GETTING NEW DATASET FOR DIGITS {digits}")
+    end_time = time.time()
+    print(f"TIME TO LOAD DATASET: {end_time - start_time:.2f}s")
 
+    start_time = time.time()
     state_dict = torch.load(model_path, map_location=device)
 
     # get the weights and biases of the quantized model (for the features layer)
@@ -70,13 +76,20 @@ for model_path in model_paths:
     params[1].data = f_bias_float
     params[2].data = r_weights_float
     params[3].data = r_bias_float
+    end_time = time.time()
+    print(f"TIME TO LOAD MODEL: {end_time - start_time:.2f}s")
 
     # Getting CKA
+    start_time = time.time()
     cka = kernel_calc(targets, model.features(data))
+    end_time = time.time()
+    print(f"TIME TO CALCULATE CKA: {end_time - start_time:.2f}s")
 
     # Getting Loss
+    start_time = time.time()
     model.eval()
     loss = train(loader=MNIST, model=model, device=device, loss_function=nn.MSELoss(), values=digits, backwards=False, record_loss=True)
+    end_time = time.time()
 
     losses[i] = loss
     ckas[i] = cka
