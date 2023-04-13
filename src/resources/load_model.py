@@ -31,7 +31,7 @@ def load_model(lr: float, slr: float, digits: (int, int), epoch: int) -> NN:
     return model
 
 
-def get_model_saves(directory: str) -> list[str]:
+def get_model_saves(directory: str, mnist_digits: list[int]) -> list[str]:
     """
     Returns a list of all the model saves in the specified directory accessible from the current program's directory.
 
@@ -41,6 +41,8 @@ def get_model_saves(directory: str) -> list[str]:
     paths = []
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith(".pt"):
-                paths.append(os.path.join(root, file))
+            if file.endswith("hyperparams.txt"):
+                for model in os.listdir(root):
+                    if file.endswith('.pt'):
+                        paths.append(os.path.join(root, model))
     return paths

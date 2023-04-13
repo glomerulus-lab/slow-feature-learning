@@ -13,15 +13,26 @@ from resources import set_device
 from resources import train
 from resources import NN
 import time
+import argparse
 import torch
 import torch.nn as nn
+
+
+def parseHyperparams() -> list[int]:
+    """
+    Takes the system argument and returns
+    @return arg: mnist digit pair.
+    """
+    parser = argparse.ArgumentParser(description="CKA calculator")
+    parser.add_argument("--mnist_values", type=int, nargs='+', required=True, help="MNIST values to use")
+    return parser.parse_args()
+
 
 device = set_device()
 
 # Load MNIST dataset 
 MNIST = mnist_dataset(batch_size=0, train=True, values=[0, 1])
-MNIST_values = "01"
-digits = [0, 1]
+digits = parseHyperparams()
 data, targets = next(iter(MNIST))
 data = torch.squeeze(data, dim=1)
 data = data.view(data.size(0), -1)
@@ -58,7 +69,7 @@ for model_path in model_paths:
         'features.hidden_layer._packed_params._packed_params'][0]
     f_bias_quant = state_dict[
         'features.hidden_layer._packed_params._packed_params'][1]
-    
+
     # dequantize the weights and biases
     f_weights_float = torch.dequantize(f_weights_quant)
     f_bias_float = torch.dequantize(f_bias_quant)
@@ -66,7 +77,7 @@ for model_path in model_paths:
     # get the weights and biases of the quantized model (for the readout layer)
     r_weights_quant = state_dict['readout._packed_params._packed_params'][0]
     r_bias_quant = state_dict['readout._packed_params._packed_params'][1]
-    
+
     # dequantize the weights and bises
     r_weights_float = torch.dequantize(r_weights_quant)
     r_bias_float = torch.dequantize(r_bias_quant)
@@ -88,7 +99,8 @@ for model_path in model_paths:
     # Getting Loss
     start_time = time.time()
     model.eval()
-    loss = train(loader=MNIST, model=model, device=device, loss_function=nn.MSELoss(), values=digits, backwards=False, record_loss=True)
+    loss = train(loader=MNIST, model=model, device=device, loss_function=nn.MSELoss(), values=digits, backwards=False,
+                 record_loss=True)
     end_time = time.time()
 
     losses[i] = loss
