@@ -38,11 +38,18 @@ def get_model_saves(directory: str, mnist_digits: list[int]) -> list[str]:
     :param directory: root directory to search for model saves
     :return paths: list of paths to model saves
     """
+
+    digits = ''.join(map(str, mnist_digits))
+    mnist_digits.reverse()
+    rdigits = ''.join(map(str, mnist_digits))
     paths = []
+    
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.endswith("hyperparams.txt"):
+                print(f"ROOT: {root} | DIRS: {dirs} | FILE {file}")
                 for model in os.listdir(root):
-                    if file.endswith('.pt'):
+                    if ((file.endswith('.pt') and root.endswith(digits)) or
+                    (file.endswith('.pt') and root.endswith(rdigtis))):
                         paths.append(os.path.join(root, model))
     return paths
