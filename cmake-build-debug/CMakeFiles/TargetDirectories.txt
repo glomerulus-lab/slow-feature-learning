@@ -1,3 +1,0 @@
-/Users/cameronkaminski/glomerulus-lab/slow-feature-learning/cmake-build-debug/CMakeFiles/slow_feature_learning.dir
-/Users/cameronkaminski/glomerulus-lab/slow-feature-learning/cmake-build-debug/CMakeFiles/edit_cache.dir
-/Users/cameronkaminski/glomerulus-lab/slow-feature-learning/cmake-build-debug/CMakeFiles/rebuild_cache.dir
