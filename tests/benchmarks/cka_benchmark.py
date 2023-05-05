@@ -23,7 +23,7 @@ def time_decorator(func):
         func(*args, **kwargs)
         end_time = time.time()
         elapsed_time = end_time - start_time
-        print(f'Elapsed time for {func.__name__}: {elapsed_time}')
+
         return elapsed_time
     return wrapper
 
@@ -44,19 +44,10 @@ def vector_centering(v, device='cpu'):
 
 @time_decorator
 def cka_new(y, phi, device='cpu'):
-    yc = vector_centering(y, device=device)
-    K1c = yc.T @ yc
-    phic = kernel_centering(phi, device=device)
-    v = phic.T @ yc
-    return (v.T @ v)/(torch.norm(y @ y.T)*torch.norm(phi @ phi.T)).to(device)
-
-
-@time_decorator
-def cka_est(y, phi, device='cpu'):
     y = vector_centering(y, device=device)
     phic = kernel_centering(phi, device=device)
     v = phi.T @ y
-    return (v.T @ v) / (y.T @ y * torch.norm(phic.T @ phic)).to(device)
+    return (v.T @ v) / (y.T @ y * torch.norm(phic.T @ phic))
 
 
 @time_decorator
@@ -65,7 +56,7 @@ def cka_old(y, phi, device='cpu'):
     K1c = yc.T @ yc
     phic = kernel_centering(phi, device=device)
     K2c = phic @ phic.T
-    return torch.trace(K1c @ K2c)/(torch.norm(K1c)*torch.norm(K2c)).to(device)
+    return torch.trace(K1c @ K2c)/(torch.norm(K1c)*torch.norm(K2c))
 
 
 
@@ -76,15 +67,18 @@ benchmarks = {
 }
 
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+print(f"DEVICE SET TO {device}")
+
 # Run each function and store the timing and result in the benchmarks dictionary
 for i in range(16):
-    y = torch.randn(int(12000 / ((i + 1) / 16)),
-                    1).double()
-    phi = torch.randn(int(12000 / ((i + 1) / 16)), 
-                          int(1000 / ((i + 1) / 16))).double()
+    print(f"TRAINING ON SIZE {int(12000 / ((i + 1) / 16))}")
+    y = torch.randn(int(12000 * 10 / (i + 1)), 1).double()
+    phi = torch.randn(int(12000 * 10 / (i + 1)), 
+                      int(1000 * 10 / (i + 1))).double()
     benchmarks['cka_new'].append(time_decorator(cka_new)(y, phi))
-    benchmarks['cka_est'].append(time_decorator(cka_est)(y, phi))
+    print(f"CKA NEW : {benchmarks['cka_new'][-1]}")
     benchmarks['cka_old'].append(time_decorator(cka_old)(y, phi))
+    print(f"CKA OLD : {benchmarks['cka_old'][-1]}")
 
 with open('benchmarks.csv', mode='w', newline='') as file:
     writer = csv.writer(file)
