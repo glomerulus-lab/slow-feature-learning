@@ -53,16 +53,18 @@ def cka_new(y, phi, device='cpu'):
 @time_decorator
 def cka_old(y, phi, device='cpu'):
     yc = vector_centering(y.T, device=device)
+    print('Shape of yc:', yc.shape)
     K1c = yc.T @ yc
     phic = kernel_centering(phi, device=device)
     K2c = phic @ phic.T
+    print('Shape of K1c:', K1c.shape)
+    print('Shape of K2c:', K2c.shape)
     return torch.trace(K1c @ K2c)/(torch.norm(K1c)*torch.norm(K2c))
 
 
 
 benchmarks = {
     'cka_new': [],
-    'cka_est': [],
     'cka_old': []
 }
 
@@ -71,17 +73,16 @@ print(f"DEVICE SET TO {device}")
 
 # Run each function and store the timing and result in the benchmarks dictionary
 for i in range(16):
-    print(f"TRAINING ON SIZE {int(12000 / ((i + 1) / 16))}")
-    y = torch.randn(int(12000 * 10 / (i + 1)), 1).double()
-    phi = torch.randn(int(12000 * 10 / (i + 1)), 
-                      int(1000 * 10 / (i + 1))).double()
+    i = 16 - i
+    print(f"TRAINING ON SIZE {2 ** i}, {int(0.08 * 2 ** i)}")
+    y = torch.randn(2 ** i, 1).double()
+    phi = torch.randn(2 ** i, int(0.08 * 2 ** i)).double()
     benchmarks['cka_new'].append(time_decorator(cka_new)(y, phi))
     print(f"CKA NEW : {benchmarks['cka_new'][-1]}")
     benchmarks['cka_old'].append(time_decorator(cka_old)(y, phi))
     print(f"CKA OLD : {benchmarks['cka_old'][-1]}")
 
-with open('benchmarks.csv', mode='w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(benchmarks.keys())
-    writer.writerow(benchmarks.values())
-
+    with open(arg + ".csv", mode='w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(benchmarks.keys())
+        writer.writerow(benchmarks.values())
