@@ -21,5 +21,5 @@ def matrix_centering(x: torch.Tensor) -> torch.Tensor:
     :param x: an (nxd) tensor
     :return: the centered version of the input
     """
-    return x - x.mean(dim=1) - x.mean(dim=0) + x.mean()
+    return x - x.mean(dim=1, keepdim=True) - x.mean(dim=0, keepdim=True) + x.mean()
 

@@ -7,7 +7,7 @@ LAST MODIFIED: 05.24.2023
 """
 
 import torch.nn as nn
-from model_utils import NN
+from .model_utils import NN
 import torch
 
 def load_model(PATH: str, device: str) -> torch.nn.Module:

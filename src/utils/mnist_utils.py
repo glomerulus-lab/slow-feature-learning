@@ -6,11 +6,12 @@ CREATED: 05.14.2023
 LAST MODIFIED: 05.14.2023
 """
 
+import torch
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader
 
-def mnist_dataset(batch_size: int, 
+def load_mnist_dataset(batch_size: int,
                   train: bool=True,
                   values: [int]=list(range(10))):
     """Loads mnist dataset into a dataloader object.
@@ -21,16 +22,17 @@ def mnist_dataset(batch_size: int,
     """
 
     # Initializing MNIST data set.
-    dataset = datasets.MNIST(root='dataset/',
-                             train=train,
-                             transform=transforms.ToTensor(),
-                             download=False)
+    # Initializing MNIST data set.
+    dataset = datasets.MNIST(root='dataset/', train=train, transform=transforms.ToTensor(), download=True)
+
+    if batch_size == 0:
+        batch_size = len(dataset)
 
     targets_list = dataset.targets.tolist()
     values_index = [i for i in range(len(dataset)) if targets_list[i] in values]
 
     # Creating a subset of ### MNIST targets.
     subset = torch.utils.data.Subset(dataset, values_index)
-    loader = DataLoader(dataset=subset, shuffle=True)
+    loader = DataLoader(dataset=subset, batch_size=batch_size, shuffle=True)
 
     return loader
