@@ -49,7 +49,7 @@ def get_model_paths(digits: str) ->(str, [str]):
                 model_path = os.path.join(target_path, model_file)
                 model_paths.append((model_path,
                     target_dir.split("_") + re.findall(r'\d+', model_file)))
-    model_paths_sorted = sorted(model_paths, key=lambda x: x[1][0])
+    model_paths_sorted = sorted(model_paths, key=lambda x: x[0])
     return model_paths_sorted
 
 
@@ -61,7 +61,7 @@ if __name__ == "__main__":
 
     # Loading the MNIST dataset for the digit pairs
     values = [int(char) for char in args.mnistDigits]
-    mnist = utils.load_mnist_dataset(batch_size=0, values=[int(char) for char in args.mnistDigits]).to(device=device)
+    mnist = utils.load_mnist_dataset(batch_size=0, values=[int(char) for char in args.mnistDigits])
 
     # Extracting the targets & data
     data, targets = next(iter(mnist))
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     y_c_norm = torch.norm(y_c)
 
     # Loading all model paths (for the specified digit pair)
-    model_dir = get_model_paths(args.mnistDigits).to(device=device)
+    model_dir = get_model_paths(args.mnistDigits)
     #model_dir.sort()
 
     # Calculating the cka for each model
