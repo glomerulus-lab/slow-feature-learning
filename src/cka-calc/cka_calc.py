@@ -31,7 +31,7 @@ def parse_parameters():
                         help='MNIST digit pair to use for training and testing')
     return parser.parse_args()
 
-def get_model_paths(digits: str) -> list[tuple[str, list[str]]]:
+def get_model_paths(digits: str) ->(str, [str]):
     """ Loads the model from the specified path
     :param PATH: path to the model
     :return: model paths
@@ -61,11 +61,11 @@ if __name__ == "__main__":
 
     # Loading the MNIST dataset for the digit pairs
     values = [int(char) for char in args.mnistDigits]
-    mnist = utils.load_mnist_dataset(batch_size=0, values=[int(char) for char in args.mnistDigits])
+    mnist = utils.load_mnist_dataset(batch_size=0, values=[int(char) for char in args.mnistDigits]).to(device=device)
 
     # Extracting the targets & data
     data, targets = next(iter(mnist))
-    data = torch.squeeze(data, dim=1)
+    data = torch.squeeze(data, dim=1).to(device=device)
     data = data.view(data.size(0), -1)
 
     # Preparing the targets (y) vector for cka calculation
@@ -74,7 +74,7 @@ if __name__ == "__main__":
     y_c_norm = torch.norm(y_c)
 
     # Loading all model paths (for the specified digit pair)
-    model_dir = get_model_paths(args.mnistDigits)
+    model_dir = get_model_paths(args.mnistDigits).to(device=device)
     #model_dir.sort()
 
     # Calculating the cka for each model
