@@ -15,6 +15,7 @@ from typing import List, Tuple
 import re
 import torch
 import os
+import time
 
 # importing src utils
 import sys
@@ -54,6 +55,8 @@ def get_model_paths(digits: str) ->(str, [str]):
 
 
 if __name__ == "__main__":
+
+    start = time.time()
 
     # Hyper params
     args = parse_parameters()
@@ -96,6 +99,8 @@ if __name__ == "__main__":
             cka = (v.T @ v) / (y_c_norm ** 2 * torch.norm(phi_c.T @ phi_c))
             print(f"CKA {model_path}: {cka.item()}")
             writer.writerow([hyper_params[0], hyper_params[1], hyper_params[2], hyper_params[3], cka.item()])
-            t += 1
-            if t == 10:
-                break
+
+    end = time.time()
+    print(f"ELAPSED TIME: {end - start}")
+    
+
